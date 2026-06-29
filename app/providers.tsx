@@ -4,6 +4,7 @@ import { useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 
+import { MSWProvider } from "@/components/msw-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -29,8 +30,10 @@ export function Providers({ children }: { children: ReactNode }) {
       storageKey="ascendra-theme"
     >
       <QueryClientProvider client={queryClient}>
-        <TooltipProvider delayDuration={120}>{children}</TooltipProvider>
-        <Toaster position="bottom-right" />
+        <MSWProvider>
+          <TooltipProvider delayDuration={120}>{children}</TooltipProvider>
+          <Toaster position="bottom-right" />
+        </MSWProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
