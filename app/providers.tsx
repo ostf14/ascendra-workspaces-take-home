@@ -17,6 +17,10 @@ export function Providers({ children }: { children: ReactNode }) {
             staleTime: 30_000,
             retry: 1,
             refetchOnWindowFocus: true,
+            throwOnError: true,
+          },
+          mutations: {
+            retry: 0,
           },
         },
       })
