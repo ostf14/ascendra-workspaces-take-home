@@ -103,23 +103,23 @@
 }
 
 :root {
-  --surface-page: #fdfcf5;
-  --surface-secondary: #f5efdf;
-  --surface-tertiary: #ebe6d6;
+  --surface-page: #f7f8fa;
+  --surface-secondary: #eef1f4;
+  --surface-tertiary: #e2e7ec;
   --surface-elevated: #ffffff;
 
-  --text-primary: #3d3a34;
-  --text-secondary: #524e46;
-  --text-tertiary: #787570;
-  --text-disabled: #a8a39a;
+  --text-primary: #1f242b;
+  --text-secondary: #535b66;
+  --text-tertiary: #7e8691;
+  --text-disabled: #a8b0b9;
 
-  --border-default: rgba(61, 58, 52, 0.13);
-  --border-strong: rgba(61, 58, 52, 0.22);
-  --border-subtle: rgba(61, 58, 52, 0.07);
+  --border-default: #e2e7ec;
+  --border-strong: #d4dbe1;
+  --border-subtle: #eef1f4;
 
   --accent: #498dfa;
   --accent-hover: #3878e0;
-  --accent-muted: rgba(73, 141, 250, 0.12);
+  --accent-muted: rgba(73, 141, 250, 0.1);
   --accent-foreground: #ffffff;
 
   --status-running: #10b981;
