@@ -1,12 +1,12 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 
 import { EXPECTED_TRANSITION_SECONDS } from "@/lib/constants";
 
 // Module-level map of workspace id → epoch ms when the in-flight transition
 // started. Set by the lifecycle mutation hooks in onMutate, cleared when
-// the status settles. Survives across components subscribed via useSyncExternalStore.
+// the status settles. Subscribers tick every second to render the countdown.
 
 type Listener = () => void;
 
@@ -33,10 +33,6 @@ function subscribe(listener: Listener): () => void {
   };
 }
 
-function getSnapshot(id: string): number | undefined {
-  return startedAt.get(id);
-}
-
 export type TransitionProgress = {
   /** True once a mutation has called markTransitionStarted for this id. */
   started: boolean;
@@ -55,54 +51,46 @@ const SSR_DEFAULT: TransitionProgress = {
   elapsedSeconds: 0,
 };
 
-// Ticks every second so subscribers re-render the countdown. Cheap — only
-// fires while there is an active transition somewhere in the app.
-let tickHandle: number | undefined;
-let tickRefCount = 0;
-
-function ensureTicker(): () => void {
-  if (typeof window === "undefined") return () => {};
-  tickRefCount += 1;
-  if (tickHandle === undefined) {
-    tickHandle = window.setInterval(emit, 1000);
-  }
-  return () => {
-    tickRefCount -= 1;
-    if (tickRefCount <= 0 && tickHandle !== undefined) {
-      window.clearInterval(tickHandle);
-      tickHandle = undefined;
-      tickRefCount = 0;
-    }
-  };
-}
-
-export function useTransitionProgress(id: string): TransitionProgress {
-  const started = useSyncExternalStore(
-    (listener) => {
-      const stopTick = ensureTicker();
-      const stopSub = subscribe(listener);
-      return () => {
-        stopSub();
-        stopTick();
-      };
-    },
-    () => getSnapshot(id),
-    () => undefined
-  );
-
-  if (started === undefined) return SSR_DEFAULT;
-
-  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - started) / 1000));
+function computeProgress(id: string): TransitionProgress {
+  const at = startedAt.get(id);
+  if (at === undefined) return SSR_DEFAULT;
+  const elapsedSeconds = Math.max(0, Math.floor((Date.now() - at) / 1000));
   const secondsRemaining = Math.max(
     0,
     EXPECTED_TRANSITION_SECONDS - elapsedSeconds
   );
-  const almostDone = elapsedSeconds >= EXPECTED_TRANSITION_SECONDS;
-
   return {
     started: true,
     elapsedSeconds,
     secondsRemaining,
-    almostDone,
+    almostDone: elapsedSeconds >= EXPECTED_TRANSITION_SECONDS,
   };
+}
+
+export function useTransitionProgress(id: string): TransitionProgress {
+  // Re-render on:
+  //   - external changes (mark / clear) via the listener subscription
+  //   - every wall-second so the countdown ticks even when the underlying
+  //     started-at value doesn't move
+  const [progress, setProgress] = useState<TransitionProgress>(() =>
+    typeof window === "undefined" ? SSR_DEFAULT : computeProgress(id)
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    const refresh = () => {
+      if (cancelled) return;
+      setProgress(computeProgress(id));
+    };
+    refresh();
+    const unsubscribe = subscribe(refresh);
+    const tick = window.setInterval(refresh, 1000);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+      window.clearInterval(tick);
+    };
+  }, [id]);
+
+  return progress;
 }
