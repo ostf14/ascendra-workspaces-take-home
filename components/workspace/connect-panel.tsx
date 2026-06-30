@@ -125,9 +125,9 @@ function ConnectButton({
 
   if (disabled || !href) {
     return (
-      <div role="presentation" aria-disabled className={className}>
+      <button type="button" disabled aria-disabled className={className}>
         {body}
-      </div>
+      </button>
     );
   }
 
@@ -136,7 +136,10 @@ function ConnectButton({
       href={href}
       target={newTab ? "_blank" : undefined}
       rel={newTab ? "noopener noreferrer" : undefined}
-      className={className}
+      className={cn(
+        className,
+        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-coral"
+      )}
     >
       {body}
     </a>

@@ -34,6 +34,19 @@ export default function AdminTemplatesPage() {
           <Skeleton className="h-60" />
           <Skeleton className="h-60" />
         </div>
+      ) : data.length === 0 ? (
+        <section className="flex flex-col items-start gap-4 rounded-lg border border-border-default bg-surface-elevated p-8">
+          <h2 className="text-md font-medium text-text-primary">No templates yet.</h2>
+          <p className="text-sm text-text-secondary">
+            Create the first one to let developers provision from a known base image.
+          </p>
+          <Button asChild>
+            <Link href="/admin/templates/new">
+              <Plus className="size-4" strokeWidth={1.5} />
+              New template
+            </Link>
+          </Button>
+        </section>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
           {data.map((template) => (

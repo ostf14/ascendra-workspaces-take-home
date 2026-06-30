@@ -1,10 +1,20 @@
-import { RoutePlaceholder } from "@/components/layout/route-placeholder";
+import Link from "next/link";
+import { Compass } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { CenteredCard } from "@/components/layout/centered-card";
 
 export default function NotFound() {
   return (
-    <RoutePlaceholder
-      path="not-found"
-      hint="The page you tried to reach doesn't exist."
-    />
+    <CenteredCard
+      icon={<Compass className="size-4" strokeWidth={1.5} />}
+      eyebrow="404"
+      title="We couldn't find that page."
+      description="The link may be old, or the workspace may have been deleted."
+    >
+      <Button asChild>
+        <Link href="/">Take me home</Link>
+      </Button>
+    </CenteredCard>
   );
 }

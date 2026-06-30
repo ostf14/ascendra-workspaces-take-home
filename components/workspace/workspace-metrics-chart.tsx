@@ -56,7 +56,7 @@ export function WorkspaceMetricsChart({ id }: { id: string }) {
           ))}
         </div>
       </header>
-      <div className="grid grid-cols-1 gap-5 p-5 lg:grid-cols-2">
+      <div key={range} className="grid animate-fade-in grid-cols-1 gap-5 p-5 lg:grid-cols-2">
         <ChartPanel
           title="CPU"
           color="var(--accent)"

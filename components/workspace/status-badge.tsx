@@ -34,6 +34,7 @@ export function StatusBadge({
   return (
     <span
       aria-label={`Status: ${entry.label}`}
+      aria-live={entry.isTransitional ? "polite" : undefined}
       className={cn(
         "inline-flex h-[22px] items-center gap-1.5 rounded-sm border px-2 text-[11px] font-medium leading-none",
         entry.isTransitional && "animate-pulse-soft",

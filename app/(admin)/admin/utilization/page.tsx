@@ -55,14 +55,16 @@ export default function AdminUtilizationPage() {
         </div>
       </header>
 
-      <AdminOverviewChart
-        series={
-          data ? { cpu: data.cpu, memory: data.memory } : undefined
-        }
-        loading={isPending}
-      />
+      <div key={range} className="animate-fade-in">
+        <AdminOverviewChart
+          series={
+            data ? { cpu: data.cpu, memory: data.memory } : undefined
+          }
+          loading={isPending}
+        />
+      </div>
 
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div key={`${range}-bottom`} className="grid animate-fade-in grid-cols-1 gap-5 lg:grid-cols-2">
         {isPending || !data ? (
           <>
             <Skeleton className="h-72 w-full" />
