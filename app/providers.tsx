@@ -27,6 +27,10 @@ export function Providers({ children }: { children: ReactNode }) {
   );
 
   return (
+    {/* Light primary per decision 05 — warm cream is the B2B-admin
+        default; dark is opt-in via the top-nav toggle. enableSystem=false
+        keeps the choice deterministic so prefers-color-scheme: dark doesn't
+        override the brand default on first paint. */}
     <ThemeProvider
       attribute="class"
       defaultTheme="light"
