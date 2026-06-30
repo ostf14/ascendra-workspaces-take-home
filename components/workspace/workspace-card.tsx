@@ -10,7 +10,6 @@ import { UsageMetric } from "@/components/workspace/usage-metric";
 import { WorkspaceActionsContext } from "@/components/workspace/workspace-actions-menu";
 import { WorkspacePreviewSheet } from "@/components/workspace/workspace-preview-sheet";
 import type { VM } from "@/lib/domain/types";
-import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 export function WorkspaceCard({ workspace }: { workspace: VM }) {
@@ -50,15 +49,12 @@ export function WorkspaceCard({ workspace }: { workspace: VM }) {
           </div>
         </Link>
 
-        <footer className="flex items-center justify-between gap-2">
+        <footer className="flex items-center gap-2">
           <LifecycleControls
             workspace={workspace}
             variant="card"
             onOpen={() => setSheetOpen(true)}
           />
-          <span className="font-mono text-xs text-text-tertiary tabular-nums">
-            {formatCurrency(workspace.hourlyCost)}/hr
-          </span>
         </footer>
 
         <WorkspacePreviewSheet

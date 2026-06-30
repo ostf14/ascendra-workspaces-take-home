@@ -128,5 +128,5 @@ For every data-driven surface:
 
 ## Open questions
 
-- Does cost appear on the list card, or only on detail? Current plan: detail only — cost is mostly an admin concern, and noisy on a card.
+- ~~Does cost appear on the list card, or only on detail?~~ **Resolved** — cost is not shown on the developer card. Cost is an admin concern; the developer surface shows session cost prominently on the detail header and demotes hourly cost to a row in the metadata grid (same register as Region / Created). Admin VM detail keeps both prominent.
 - Does the developer ever see other people's workspaces? Default no; revisit if admin and developer roles share screens.

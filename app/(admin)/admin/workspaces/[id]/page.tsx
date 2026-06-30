@@ -62,7 +62,7 @@ export default function AdminWorkspaceDetailPage({
             <div className="flex flex-col gap-4">
               <ConnectPanel workspace={data} />
               <WorkspaceMetricsChart id={data.id} />
-              <WorkspaceMetadata workspace={data} />
+              <WorkspaceMetadata workspace={data} variant="admin" />
               <WorkspaceLogs workspace={data} defaultOpen />
             </div>
             <div className="flex flex-col gap-4">
