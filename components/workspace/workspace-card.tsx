@@ -1,22 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Loader2, Play, SquareArrowOutUpRight } from "lucide-react";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { IdlePill } from "@/components/workspace/idle-pill";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StatusBadge } from "@/components/workspace/status-badge";
 import { UsageMetric } from "@/components/workspace/usage-metric";
-import { useStartWorkspace } from "@/lib/hooks/use-workspace-lifecycle";
+import { WorkspacePreviewSheet } from "@/components/workspace/workspace-preview-sheet";
 import type { VM } from "@/lib/domain/types";
+import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 export function WorkspaceCard({ workspace }: { workspace: VM }) {
   const detailHref = `/workspaces/${workspace.id}`;
-  const start = useStartWorkspace();
-  const isTransitional =
-    workspace.status === "starting" || workspace.status === "stopping";
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
     <article
@@ -27,7 +25,7 @@ export function WorkspaceCard({ workspace }: { workspace: VM }) {
     >
       <Link
         href={detailHref}
-        aria-label={`Open ${workspace.name}`}
+        aria-label={`Open ${workspace.name} detail`}
         className="flex flex-col gap-4 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-coral"
       >
         <header className="flex items-start justify-between gap-3">
@@ -51,35 +49,21 @@ export function WorkspaceCard({ workspace }: { workspace: VM }) {
       </Link>
 
       <footer className="flex items-center justify-between gap-2">
-        {workspace.status === "running" ? (
-          <Button asChild size="sm" variant="default">
-            <Link href={detailHref}>
-              <SquareArrowOutUpRight className="size-4" strokeWidth={1.5} />
-              Open
-            </Link>
-          </Button>
-        ) : workspace.status === "stopped" ? (
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => start.mutate(workspace.id)}
-            disabled={start.isPending}
-          >
-            <Play className="size-4" strokeWidth={1.5} />
-            Start
-          </Button>
-        ) : isTransitional ? (
-          <Button size="sm" variant="default" disabled>
-            <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
-            {workspace.status === "starting" ? "Starting…" : "Stopping…"}
-          </Button>
-        ) : (
-          <Button asChild size="sm" variant="default">
-            <Link href={detailHref}>View details</Link>
-          </Button>
-        )}
-        <LifecycleControls workspace={workspace} variant="card" />
+        <LifecycleControls
+          workspace={workspace}
+          variant="card"
+          onOpen={() => setSheetOpen(true)}
+        />
+        <span className="font-mono text-xs text-text-tertiary tabular-nums">
+          {formatCurrency(workspace.hourlyCost)}/hr
+        </span>
       </footer>
+
+      <WorkspacePreviewSheet
+        workspace={workspace}
+        open={sheetOpen}
+        onOpenChange={setSheetOpen}
+      />
     </article>
   );
 }
