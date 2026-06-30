@@ -6,6 +6,7 @@ import { ArrowRight, Leaf, MoonStar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AdminOverview } from "@/lib/domain/types";
+import { formatCurrency, formatNumber } from "@/lib/utils/format";
 
 export function WasteInsightCard({
   data,
@@ -49,11 +50,6 @@ export function WasteInsightCard({
     );
   }
 
-  const monthlyWasteFormatted = estimatedMonthlyWaste.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  });
-
   return (
     <section
       aria-label="Fleet waste"
@@ -68,7 +64,9 @@ export function WasteInsightCard({
         </span>
         <div className="flex flex-col gap-1.5">
           <h2 className="text-md font-medium text-text-primary">
-            {idleCount} idle workspaces, ~${monthlyWasteFormatted}/month wasted
+            {formatNumber(idleCount)} idle workspaces, ~
+            {formatCurrency(estimatedMonthlyWaste, { fractionDigits: 0 })}/month
+            wasted
           </h2>
           <p className="text-sm text-text-secondary">
             Stop them to recover the spend. Files and settings are preserved.

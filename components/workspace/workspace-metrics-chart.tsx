@@ -14,6 +14,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useWorkspaceMetrics } from "@/lib/hooks/use-workspaces";
 import type { WorkspaceMetricsRange } from "@/lib/domain/types";
+import { formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 const RANGES: { value: WorkspaceMetricsRange; label: string }[] = [
@@ -148,7 +149,7 @@ function ChartPanel({
                         })}
                       </div>
                       <div className="font-mono text-text-primary">
-                        {Math.round(raw.v)}%
+                        {formatPercent(raw.v)}
                       </div>
                     </div>
                   );

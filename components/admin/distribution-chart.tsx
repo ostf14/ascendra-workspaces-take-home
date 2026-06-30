@@ -1,6 +1,7 @@
 "use client";
 
 import type { UtilizationBucket } from "@/lib/domain/types";
+import { formatNumber, formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 // Horizontal bar histogram (per decision 03): reveals "half hot, half cold"
@@ -20,7 +21,7 @@ export function DistributionChart({ buckets }: { buckets: UtilizationBucket[] })
           CPU distribution · running workspaces
         </h2>
         <span className="text-xs text-text-tertiary">
-          {total} workspace{total === 1 ? "" : "s"}
+          {formatNumber(total)} workspace{total === 1 ? "" : "s"}
         </span>
       </header>
       <ul className="flex flex-col gap-2 p-5">
@@ -47,7 +48,7 @@ export function DistributionChart({ buckets }: { buckets: UtilizationBucket[] })
                 />
               </div>
               <span className="text-right font-mono text-xs tabular-nums text-text-secondary">
-                {bucket.count} · {sharePct.toFixed(0)}%
+                {formatNumber(bucket.count)} · {formatPercent(sharePct)}
               </span>
             </li>
           );

@@ -4,13 +4,7 @@ import { AdminOverviewChart } from "@/components/admin/admin-overview-chart";
 import { HeroMetric } from "@/components/admin/hero-metric";
 import { WasteInsightCard } from "@/components/admin/waste-insight-card";
 import { useAdminOverview } from "@/lib/hooks/use-fleet";
-
-function formatCurrency(value: number, fractionDigits = 2): string {
-  return `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  })}`;
-}
+import { formatCurrency, formatPercent } from "@/lib/utils/format";
 
 export default function AdminOverviewPage() {
   const { data, isPending } = useAdminOverview();
@@ -48,19 +42,19 @@ export default function AdminOverviewPage() {
         <HeroMetric
           label="Month to date"
           loading={isPending}
-          value={data ? formatCurrency(data.monthToDateCost, 0) : "—"}
+          value={data ? formatCurrency(data.monthToDateCost, { fractionDigits: 0 }) : "—"}
           delta={data?.deltas.monthToDateCost}
         />
         <HeroMetric
           label="Projected month"
           loading={isPending}
-          value={data ? formatCurrency(data.projectedMonthlyCost, 0) : "—"}
+          value={data ? formatCurrency(data.projectedMonthlyCost, { fractionDigits: 0 }) : "—"}
           delta={data?.deltas.projectedMonthlyCost}
         />
         <HeroMetric
           label="Aggregate CPU"
           loading={isPending}
-          value={data ? `${Math.round(data.aggregateCpu)}%` : "—"}
+          value={data ? formatPercent(data.aggregateCpu) : "—"}
           delta={data?.deltas.aggregateCpu}
         />
       </div>

@@ -3,6 +3,7 @@
 import { Cpu, HardDrive, MemoryStick } from "lucide-react";
 
 import type { TemplateWithUsage, VMTemplate } from "@/lib/domain/types";
+import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 export function TemplateCard({
@@ -36,7 +37,7 @@ export function TemplateCard({
       <header className="flex items-baseline justify-between gap-3">
         <h3 className="text-sm font-medium text-text-primary">{template.name}</h3>
         <span className="font-mono text-xs text-text-tertiary">
-          ${template.hourlyCost.toFixed(2)}/hr
+          {formatCurrency(template.hourlyCost)}/hr
         </span>
       </header>
       <p className="text-xs text-text-secondary">{template.description}</p>

@@ -20,6 +20,7 @@ import type {
   FleetSortKey,
   SortOrder,
 } from "@/lib/domain/types";
+import { formatCurrency, formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 type Column = {
@@ -196,13 +197,13 @@ export function AdminVMTable({
                     <StatusBadge status={row.status} />
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {Math.round(row.cpu)}%
+                    {formatPercent(row.cpu)}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {Math.round(row.memory)}%
+                    {formatPercent(row.memory)}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {Math.round(row.disk)}%
+                    {formatPercent(row.disk)}
                   </td>
                   <td className="px-3 py-2 text-right text-text-secondary">
                     {formatDistanceToNow(parseISO(row.lastActiveAt), {
@@ -210,7 +211,7 @@ export function AdminVMTable({
                     })}
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    ${row.hourlyCost.toFixed(2)}
+                    {formatCurrency(row.hourlyCost)}
                   </td>
                   <td className="px-3 py-2 text-right">
                     <DropdownMenu>

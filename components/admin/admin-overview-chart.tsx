@@ -12,6 +12,7 @@ import {
 
 import { Skeleton } from "@/components/ui/skeleton";
 import type { TimePoint } from "@/lib/domain/types";
+import { formatPercent } from "@/lib/utils/format";
 
 type Series = { cpu: TimePoint[]; memory: TimePoint[] };
 
@@ -143,14 +144,14 @@ export function AdminOverviewChart({
                         className="inline-block size-2 rounded-full"
                         style={{ background: "var(--accent)" }}
                       />
-                      CPU {Math.round(raw.cpu)}%
+                      CPU {formatPercent(raw.cpu)}
                     </p>
                     <p className="flex items-center gap-2 font-mono text-text-primary">
                       <span
                         className="inline-block size-2 rounded-full"
                         style={{ background: "#14b8a6" }}
                       />
-                      Memory {Math.round(raw.memory)}%
+                      Memory {formatPercent(raw.memory)}
                     </p>
                   </div>
                 );

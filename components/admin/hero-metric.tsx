@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 
 import type { Delta } from "@/lib/domain/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 export function HeroMetric({
@@ -61,7 +62,7 @@ function DeltaPill({ delta }: { delta: Delta }) {
     >
       <Icon className="size-3" strokeWidth={1.5} />
       <span className="font-mono tabular-nums">
-        {Math.abs(delta.percent).toFixed(1)}%
+        {formatPercent(Math.abs(delta.percent), { fractionDigits: 1 })}
       </span>
       <span className="text-text-tertiary">vs last week</span>
     </span>

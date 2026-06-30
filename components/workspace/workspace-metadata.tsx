@@ -3,6 +3,7 @@
 import { format, formatDistanceToNow, parseISO } from "date-fns";
 
 import type { VM } from "@/lib/domain/types";
+import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 function formatUptime(workspace: VM): string {
@@ -39,11 +40,11 @@ export function WorkspaceMetadata({
     { label: "Uptime", value: formatUptime(workspace) },
     {
       label: "Hourly cost",
-      value: `$${workspace.hourlyCost.toFixed(2)}`,
+      value: formatCurrency(workspace.hourlyCost),
     },
     {
       label: "Session cost",
-      value: `$${sessionCost(workspace).toFixed(2)}`,
+      value: formatCurrency(sessionCost(workspace)),
     },
   ];
 

@@ -3,6 +3,7 @@
 import { Area, AreaChart, ResponsiveContainer, YAxis } from "recharts";
 
 import type { TimePoint } from "@/lib/domain/types";
+import { formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 type Tone = "neutral" | "warm" | "hot";
@@ -35,7 +36,10 @@ export function UsageMetric({
   className?: string;
 }) {
   const stroke = TONE_STROKE[tone(value)];
-  const formatted = unit === "%" ? Math.round(value).toString() : value.toFixed(1);
+  // Render "34%" as one token so there's no gap between the digit and the
+  // percent sign (UI convention; "34 %" reads unnaturally in English).
+  const isPercent = unit === "%";
+  const formatted = isPercent ? formatPercent(value) : `${value.toFixed(1)} ${unit}`;
 
   return (
     <div
@@ -46,17 +50,14 @@ export function UsageMetric({
       )}
     >
       <span className="text-xs text-text-tertiary">{label}</span>
-      <div className="flex items-baseline gap-1">
-        <span
-          className={cn(
-            "font-mono font-medium tabular-nums text-text-primary",
-            compact ? "text-sm" : "text-md"
-          )}
-        >
-          {formatted}
-        </span>
-        <span className="text-xs text-text-tertiary">{unit}</span>
-      </div>
+      <span
+        className={cn(
+          "font-mono font-medium tabular-nums text-text-primary",
+          compact ? "text-sm" : "text-md"
+        )}
+      >
+        {formatted}
+      </span>
       {series && series.length > 1 ? (
         <div className={cn("h-5", compact ? "w-full" : "w-24")}>
           <ResponsiveContainer width="100%" height="100%">

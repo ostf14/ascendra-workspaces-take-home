@@ -1,13 +1,7 @@
 "use client";
 
 import type { CostByTemplate } from "@/lib/domain/types";
-
-function formatMonthly(value: number): string {
-  return `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`;
-}
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/utils/format";
 
 export function CostByTemplateCard({ rows }: { rows: CostByTemplate[] }) {
   const total = rows.reduce((acc, row) => acc + row.monthlyCost, 0) || 1;
@@ -36,7 +30,7 @@ export function CostByTemplateCard({ rows }: { rows: CostByTemplate[] }) {
             >
               <span className="text-sm text-text-primary">{row.templateName}</span>
               <span className="font-mono text-sm tabular-nums text-text-primary">
-                {formatMonthly(row.monthlyCost)}
+                {formatCurrency(row.monthlyCost, { fractionDigits: 0 })}
               </span>
               <div className="col-span-2 h-1.5 overflow-hidden rounded-sm bg-surface-secondary">
                 <span
@@ -45,10 +39,11 @@ export function CostByTemplateCard({ rows }: { rows: CostByTemplate[] }) {
                 />
               </div>
               <span className="text-xs text-text-tertiary">
-                {row.workspaceCount} workspace{row.workspaceCount === 1 ? "" : "s"}
+                {formatNumber(row.workspaceCount)} workspace
+                {row.workspaceCount === 1 ? "" : "s"}
               </span>
               <span className="text-right text-xs text-text-tertiary tabular-nums">
-                {sharePct.toFixed(0)}%
+                {formatPercent(sharePct)}
               </span>
             </li>
           );

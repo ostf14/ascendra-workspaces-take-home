@@ -5,13 +5,7 @@ import { Cpu, HardDrive, MemoryStick, Pencil } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import type { TemplateWithUsage } from "@/lib/domain/types";
-
-function formatMonthly(value: number): string {
-  return `$${value.toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })}`;
-}
+import { formatCurrency, formatNumber } from "@/lib/utils/format";
 
 export function TemplateListCard({ template }: { template: TemplateWithUsage }) {
   const editHref = `/admin/templates/${template.id}`;
@@ -25,7 +19,7 @@ export function TemplateListCard({ template }: { template: TemplateWithUsage }) 
           </p>
         </div>
         <span className="font-mono text-xs text-text-tertiary">
-          ${template.hourlyCost.toFixed(2)}/hr
+          {formatCurrency(template.hourlyCost)}/hr
         </span>
       </header>
       <p className="text-sm text-text-secondary">{template.description}</p>
@@ -61,11 +55,15 @@ export function TemplateListCard({ template }: { template: TemplateWithUsage }) 
             In use
           </dt>
           <dd className="font-mono text-sm tabular-nums text-text-primary">
-            {template.usage.workspaceCount} workspace
+            {formatNumber(template.usage.workspaceCount)} workspace
             {template.usage.workspaceCount === 1 ? "" : "s"}
           </dd>
           <dd className="text-xs text-text-tertiary">
-            ~{formatMonthly(template.usage.monthlyCostContribution)} / month
+            ~
+            {formatCurrency(template.usage.monthlyCostContribution, {
+              fractionDigits: 0,
+            })}{" "}
+            / month
           </dd>
         </dl>
         <Button asChild size="sm" variant="ghost">
