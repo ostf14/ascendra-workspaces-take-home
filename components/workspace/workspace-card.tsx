@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Loader2, Play, SquareArrowOutUpRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { IdlePill } from "@/components/workspace/idle-pill";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StatusBadge } from "@/components/workspace/status-badge";
 import { UsageMetric } from "@/components/workspace/usage-metric";
@@ -30,11 +31,14 @@ export function WorkspaceCard({ workspace }: { workspace: VM }) {
         className="flex flex-col gap-4 rounded-md focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-coral"
       >
         <header className="flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col items-start gap-1.5">
             <h3 className="font-mono text-sm font-medium text-text-primary">
               {workspace.name}
             </h3>
             <p className="text-xs text-text-tertiary">{workspace.templateName}</p>
+            {workspace.isIdle ? (
+              <IdlePill lastActiveAt={workspace.lastActiveAt} />
+            ) : null}
           </div>
           <StatusBadge status={workspace.status} />
         </header>

@@ -21,18 +21,17 @@ export function WorkspaceIdleHint({ workspace }: { workspace: VM }) {
   return (
     <div
       role="status"
-      className="flex items-start gap-3 rounded-lg border border-border-default bg-surface-secondary px-4 py-3"
-      style={{ color: "var(--status-idle)" }}
+      className="flex items-start gap-3 rounded-lg border border-border-default bg-surface-secondary px-4 py-3 text-sm text-text-secondary"
     >
-      <Moon className="mt-0.5 size-4" strokeWidth={1.5} />
-      <div className="flex flex-col gap-0.5 text-sm">
-        <p className="font-medium">
-          Idle for {formatDistanceToNow(lastActive)}.
-        </p>
-        <p className="text-xs text-text-secondary">
-          Auto-stop in about {stopsIn} minutes. Files and settings will be preserved.
-        </p>
-      </div>
+      <Moon
+        className="mt-0.5 size-4"
+        strokeWidth={1.5}
+        style={{ color: "var(--status-idle)" }}
+      />
+      <p>
+        Idle for {formatDistanceToNow(lastActive)}. Auto-stops in about{" "}
+        {stopsIn} minutes. Files and settings will be preserved.
+      </p>
     </div>
   );
 }
