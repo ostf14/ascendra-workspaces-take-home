@@ -129,7 +129,7 @@ export function TemplateForm({
         All templates
       </Link>
       <header className="flex flex-col gap-1">
-        <h1 className="text-lg font-medium text-text-primary">
+        <h1 className="text-2xl font-medium text-text-primary">
           {mode === "create" ? "New template" : "Edit template"}
         </h1>
         <p className="text-sm text-text-secondary">

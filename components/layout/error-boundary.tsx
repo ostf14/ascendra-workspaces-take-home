@@ -35,7 +35,7 @@ export function ErrorBoundary({
         <AlertTriangle className="size-4" strokeWidth={1.5} />
       </span>
       <div className="flex flex-col gap-1">
-        <h1 className="text-lg font-medium text-text-primary">{title}</h1>
+        <h1 className="text-2xl font-medium text-text-primary">{title}</h1>
         <p className="text-sm text-text-secondary">{description}</p>
       </div>
       <Button onClick={reset} variant="default">

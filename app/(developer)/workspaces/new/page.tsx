@@ -70,7 +70,7 @@ export default function NewWorkspacePage() {
       </Link>
 
       <header className="flex flex-col gap-1">
-        <h1 className="text-lg font-medium text-text-primary">New workspace</h1>
+        <h1 className="text-2xl font-medium text-text-primary">New workspace</h1>
         <p className="text-sm text-text-secondary">
           Pick a template, name it, and we&apos;ll provision a fresh remote VM.
         </p>

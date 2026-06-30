@@ -27,7 +27,7 @@ export default function AdminEditTemplatePage({
   if (!data) {
     return (
       <section className="mx-auto flex w-full max-w-[760px] flex-col gap-3 px-6 py-12">
-        <h1 className="text-lg font-medium text-text-primary">Template not found</h1>
+        <h1 className="text-2xl font-medium text-text-primary">Template not found</h1>
         <p className="text-sm text-text-secondary">
           It may have been deleted.{" "}
           <Link className="underline" href="/admin/templates">
