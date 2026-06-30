@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, RotateCcw, Square, Trash2, X } from "lucide-react";
+import { CircleStop, Loader2, RotateCcw, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -96,7 +96,7 @@ export function BulkActionBar({
             disabled={pending !== null}
             onClick={() => setConfirm("stop")}
           >
-            <Square className="size-4" strokeWidth={1.5} />
+            <CircleStop className="size-4" strokeWidth={1.5} />
             Stop
           </Button>
           <Button

@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import {
+  CircleStop,
   Loader2,
   MoreHorizontal,
   Play,
   RefreshCw,
   RotateCcw,
-  Square,
   Trash2,
 } from "lucide-react";
 
@@ -79,7 +79,7 @@ export function LifecycleControls({
             size={buttonSize}
             variant="outline"
           >
-            <Square className="size-4" strokeWidth={1.5} />
+            <CircleStop className="size-4" strokeWidth={1.5} />
             Stop
           </HintButton>
           <HintButton
