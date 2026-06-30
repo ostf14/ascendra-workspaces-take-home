@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentProps, type ReactNode } from "react";
 import {
   CircleStop,
   Loader2,
   MoreHorizontal,
   Play,
-  RefreshCw,
   RotateCcw,
+  SquareArrowOutUpRight,
   Trash2,
 } from "lucide-react";
 
@@ -16,7 +16,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -44,14 +43,26 @@ const HINTS = {
   delete: "All data for this workspace will be deleted.",
 } as const;
 
+// State machine — see screens/developer.md "Card / detail action group".
+// Exactly one primary; transitions hide everything except the pseudo-button.
+//
+// | Status     | Primary               | Sec 1   | Sec 2    | Kebab  |
+// | running    | Open (when onOpen)    | Stop    | Restart  | Delete |
+// | stopped    | Start                 | —       | —        | Delete |
+// | starting   | Starting… (disabled)  | hidden  | hidden   | hidden |
+// | stopping   | Stopping… (disabled)  | hidden  | hidden   | hidden |
+// | error      | Restart               | Recreate| —        | Delete |
+
 export function LifecycleControls({
   workspace,
   variant = "detail",
   redirectAfterDelete = false,
+  onOpen,
 }: {
   workspace: VM;
   variant?: "detail" | "card";
   redirectAfterDelete?: boolean;
+  onOpen?: () => void;
 }) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [recreateOpen, setRecreateOpen] = useState(false);
@@ -60,24 +71,79 @@ export function LifecycleControls({
   const stop = useStopWorkspace();
   const restart = useRestartWorkspace();
 
-  const busy = start.isPending || stop.isPending || restart.isPending;
+  const buttonSize = variant === "card" ? "sm" : "default";
+  const kebabSize = variant === "card" ? "sm" : "icon";
+  const status = workspace.status;
+  const isTransitional = status === "starting" || status === "stopping";
 
   const onStart = () => start.mutate(workspace.id);
   const onStop = () => stop.mutate(workspace.id);
   const onRestart = () => restart.mutate(workspace.id);
 
-  const buttonSize = variant === "card" ? "sm" : "default";
-
   return (
     <div className="flex items-center gap-2">
-      {workspace.status === "running" ? (
+      {/* Primary slot */}
+      {status === "running" && onOpen ? (
+        <Button
+          size={buttonSize}
+          variant="default"
+          onClick={onOpen}
+          aria-label={`Open ${workspace.name}`}
+        >
+          <SquareArrowOutUpRight className="size-4" strokeWidth={1.5} />
+          Open
+        </Button>
+      ) : null}
+
+      {status === "stopped" ? (
+        <HintButton
+          tooltip={HINTS.start}
+          onClick={onStart}
+          disabled={start.isPending}
+          size={buttonSize}
+          variant="default"
+        >
+          <Play className="size-4" strokeWidth={1.5} />
+          Start
+        </HintButton>
+      ) : null}
+
+      {status === "starting" ? (
+        <Button size={buttonSize} variant="default" disabled>
+          <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
+          Starting…
+        </Button>
+      ) : null}
+
+      {status === "stopping" ? (
+        <Button size={buttonSize} variant="default" disabled>
+          <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
+          Stopping…
+        </Button>
+      ) : null}
+
+      {status === "error" ? (
+        <HintButton
+          tooltip={HINTS.restart}
+          onClick={onRestart}
+          disabled={restart.isPending}
+          size={buttonSize}
+          variant="default"
+        >
+          <RotateCcw className="size-4" strokeWidth={1.5} />
+          Restart
+        </HintButton>
+      ) : null}
+
+      {/* Secondaries — hidden during transitions */}
+      {!isTransitional && status === "running" ? (
         <>
           <HintButton
             tooltip={HINTS.stop}
             onClick={onStop}
-            disabled={busy}
+            disabled={stop.isPending}
             size={buttonSize}
-            variant="outline"
+            variant="ghost"
           >
             <CircleStop className="size-4" strokeWidth={1.5} />
             Stop
@@ -85,7 +151,7 @@ export function LifecycleControls({
           <HintButton
             tooltip={HINTS.restart}
             onClick={onRestart}
-            disabled={busy}
+            disabled={restart.isPending}
             size={buttonSize}
             variant="ghost"
           >
@@ -95,92 +161,44 @@ export function LifecycleControls({
         </>
       ) : null}
 
-      {workspace.status === "stopped" ? (
+      {!isTransitional && status === "error" ? (
         <HintButton
-          tooltip={HINTS.start}
-          onClick={onStart}
-          disabled={busy}
+          tooltip={HINTS.recreate}
+          onClick={() => setRecreateOpen(true)}
           size={buttonSize}
-          variant="default"
+          variant="ghost"
         >
-          <Play className="size-4" strokeWidth={1.5} />
-          Start
+          <RotateCcw className="size-4" strokeWidth={1.5} />
+          Recreate
         </HintButton>
       ) : null}
 
-      {workspace.status === "starting" ? (
-        <Button size={buttonSize} variant="default" disabled>
-          <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
-          Starting…
-        </Button>
-      ) : null}
-
-      {workspace.status === "stopping" ? (
-        <Button size={buttonSize} variant="outline" disabled>
-          <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
-          Stopping…
-        </Button>
-      ) : null}
-
-      {workspace.status === "error" ? (
-        <>
-          <HintButton
-            tooltip={HINTS.restart}
-            onClick={onRestart}
-            disabled={busy}
-            size={buttonSize}
-            variant="default"
-          >
-            <RefreshCw className="size-4" strokeWidth={1.5} />
-            Retry
-          </HintButton>
-          <HintButton
-            tooltip={HINTS.recreate}
-            onClick={() => setRecreateOpen(true)}
-            disabled={busy}
-            size={buttonSize}
-            variant="outline"
-          >
-            <RotateCcw className="size-4" strokeWidth={1.5} />
-            Recreate
-          </HintButton>
-        </>
-      ) : null}
-
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            size={buttonSize === "default" ? "icon" : "sm"}
-            variant="ghost"
-            aria-label="More actions"
-          >
-            <MoreHorizontal className="size-4" strokeWidth={1.5} />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          {workspace.status === "running" ? (
-            <DropdownMenuItem onClick={() => setRecreateOpen(true)}>
-              <RotateCcw className="size-4" strokeWidth={1.5} />
-              Recreate
+      {/* Kebab — hidden during transitions */}
+      {!isTransitional ? (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size={kebabSize}
+              variant="ghost"
+              aria-label="More actions"
+            >
+              <MoreHorizontal className="size-4" strokeWidth={1.5} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem
+              onClick={() => setDeleteOpen(true)}
+              className={cn(
+                "text-status-error focus:bg-status-error/10 focus:text-status-error",
+                "data-[highlighted]:text-status-error data-[highlighted]:bg-status-error/10"
+              )}
+            >
+              <Trash2 className="size-4" strokeWidth={1.5} />
+              Delete workspace
             </DropdownMenuItem>
-          ) : null}
-          {workspace.status !== "starting" && workspace.status !== "stopping" ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={() => setDeleteOpen(true)}
-                className={cn(
-                  "text-status-error focus:bg-status-error/10 focus:text-status-error",
-                  "data-[highlighted]:text-status-error data-[highlighted]:bg-status-error/10"
-                )}
-              >
-                <Trash2 className="size-4" strokeWidth={1.5} />
-                Delete workspace
-              </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ) : null}
 
       <DeleteWorkspaceDialog
         workspace={workspace}
@@ -203,8 +221,8 @@ function HintButton({
   ...props
 }: {
   tooltip: string;
-  children: React.ReactNode;
-} & React.ComponentProps<typeof Button>) {
+  children: ReactNode;
+} & ComponentProps<typeof Button>) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
