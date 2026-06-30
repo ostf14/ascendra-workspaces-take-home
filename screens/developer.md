@@ -23,15 +23,42 @@ Home page for the developer. First view after sign-in.
 - Name (human-friendly, e.g. `emerald-panther-54`)
 - Status badge
 - Template name
+- Idle pill below the template name when `isIdle` — "Idle · 38h" in the idle status color (`#CA8A04`)
 - Current usage — CPU%, memory%, disk%, compact with optional sparklines
-- Primary action — contextual: `Start` when stopped, `Open` when running, spinner when transitioning
-- Secondary actions — Stop, Restart, kebab menu
+- Action group at the bottom — see the state machine below
+- Hourly cost label on the right of the footer (mono, `--text-tertiary`)
 
 **Page chrome:**
 - "New workspace" button (top right)
 - No filtering — a developer typically has 1–5 workspaces
 
 **Empty state:** headline + one-line description + CTA to create the first workspace.
+
+### Card / detail action group
+
+One row of buttons, never two. Layout:
+
+```
+[Primary] [Secondary 1] [Secondary 2] [Kebab]
+```
+
+State-to-button mapping:
+
+| Status     | Primary               | Secondary 1 | Secondary 2 | Kebab  |
+|------------|-----------------------|-------------|-------------|--------|
+| `running`  | `Open` (coral)        | `Stop`      | `Restart`   | Delete |
+| `stopped`  | `Start` (coral)       | —           | —           | Delete |
+| `starting` | `Starting…` (coral, disabled, spinner) | hidden | hidden | hidden |
+| `stopping` | `Stopping…` (coral, disabled, spinner) | hidden | hidden | hidden |
+| `error`    | `Restart` (coral)     | `Recreate`  | —           | Delete |
+
+Rules:
+- Exactly one primary action visible at any time. Never two.
+- Transitions (`starting` / `stopping`) hide every other affordance, including the kebab. Disabled-and-greyed buttons during transitions read as a visual mess; hide instead.
+- `Open` is rendered as a primary only on the **card** (Screen 1). It opens a right-side preview sheet (420px wide) listing the three connect methods from decision 02 alongside metrics + Stop / Restart shortcuts + a "Open full workspace detail →" footer link.
+- `Stop` is a ghost (secondary) button and uses the `CircleStop` icon to read as "stop transport" rather than "empty checkbox".
+
+The same state machine drives the detail page's lifecycle controls (Screen 2), with one variant: the detail page does not pass `onOpen`, so the running primary slot stays empty there — the detail surface already exposes the connect choice through the inline ConnectPanel.
 
 ## Screen 2 — Workspace detail (`/workspaces/[id]`)
 
@@ -44,8 +71,10 @@ Reached by clicking a card. Where the developer connects, diagnoses, and manages
 **Metadata region:** template name, specs (vCPU / RAM / disk), region, uptime, created at, hourly cost, accumulated session cost.
 
 **Optional regions:**
-- Idle hint when applicable: "Idle for 12 minutes, auto-stops in 18 minutes"
-- Logs (collapsed by default)
+- Idle hint when applicable: "Idle for 12 minutes. Auto-stops in 18 minutes." Icon in `--status-idle`, text in `--text-secondary`.
+- Logs (collapsed by default). Timestamped INFO/WARN/ERROR lines in JetBrains Mono.
+
+The lifecycle controls in the top region follow the same state machine as the card (see Screen 1 above). The detail page does not show an `Open` primary on `running` — the inline ConnectPanel already exposes the three connect methods at the same level of visibility.
 
 ## Flow 1 — Create new workspace
 
