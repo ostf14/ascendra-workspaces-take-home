@@ -123,9 +123,9 @@
   --accent-foreground: #ffffff;
 
   --status-running: #10b981;
-  --status-pending: #d97706;
-  --status-error: #dc2626;
-  --status-idle: #ca8a04;
+  --status-pending: #ff8040;
+  --status-error: #ff4060;
+  --status-idle: #d6a136;
 }
 
 .dark {
@@ -149,9 +149,9 @@
   --accent-foreground: #ffffff;
 
   --status-running: #10b981;
-  --status-pending: #d97706;
-  --status-error: #dc2626;
-  --status-idle: #ca8a04;
+  --status-pending: #ff8040;
+  --status-error: #ff4060;
+  --status-idle: #d6a136;
 }
 
 @keyframes pulse-soft {
