@@ -49,9 +49,15 @@ A leaves no portfolio continuity — every project reads as a one-off execution.
 - **Dark surfaces**: #0f0f11 / #161618 / #1c1e21 / #252627
 - **Dark text scale**: #ffffff → #e2e3e5 → #97979a → #6b6f76
 - **Border alpha pattern over surfaces**: rgba(255,255,255,0.13 / 0.2 / 0.07)
-- **Light theme — warm cream**: #fdfcf5 page / #f5efdf secondary / #ebe6d6 tertiary / #ffffff elevated
-- **Light text scale**: #3d3a34 → #524e46 → #787570 → #a8a39a
-- **Cool blue accent**: `#498DFA` — selected after visual review; coral (`#d97757`, the ReMargin original) was visually competing with amber status colors in the same warm-orange band. Hover state: `#3878E0`. Muted alpha: `rgba(73,141,250,0.12)` light / `0.15` dark. (Scope redefined below.)
+- **Cool blue accent**: `#498DFA` — selected after visual review; coral (`#d97757`, the ReMargin original) was visually competing with amber status colors in the same warm-orange band. Hover state: `#3878E0`. Muted alpha: `rgba(73,141,250,0.10)` light / `0.15` dark. (Scope redefined below.)
+
+### Light theme palette — diverged from ReMargin
+
+ReMargin's warm-cream light scope (`#fdfcf5` page, `#f5efdf` secondary, brown text scale `#3d3a34`) was swept after the accent moved to cool blue. Warm cream against a cool blue accent reads as two unrelated systems sharing a frame — the surface temperature has to follow the action color. A second pass referenced Integrity (a peer operational-tool case study in the same category) for the cool-neutral light scope; the temperature and contrast steps below match that direction, the tokens are ours.
+
+- **Light surfaces — cool gray-blue**: `#f7f8fa` page / `#eef1f4` secondary / `#e2e7ec` tertiary / `#ffffff` elevated
+- **Light text scale — slate**: `#1f242b` → `#535b66` → `#7e8691` → `#a8b0b9`
+- **Light borders**: `#e2e7ec` default / `#d4dbe1` strong / `#eef1f4` subtle — solid hex rather than alpha-on-surface, so borders stay legible against the cooler page
 
 ### Removed (not applicable to a dashboard)
 
@@ -67,12 +73,12 @@ A leaves no portfolio continuity — every project reads as a one-off execution.
 | Status | Color | Notes |
 |---|---|---|
 | Running | `#10B981` | Deep green, warm |
-| Starting / Stopping | `#D97706` | Warm amber, muted (not bright) |
+| Starting / Stopping | `#FF8040` | Softened warm amber — re-balanced against the cool light surfaces |
 | Stopped | `--text-tertiary` | No dedicated color — stopped reads as neutral |
-| Error | `#DC2626` | Warm red, not aggressive |
-| Idle | `#CA8A04` | Deeper amber — distinct from starting |
+| Error | `#FF4060` | Softened warm red — same re-balance pass |
+| Idle | `#D6A136` | Softened deeper amber — distinct from starting |
 
-**Cool blue accent (`#498DFA`) is the product action color** — "Open", "Start", "New workspace", primary CTAs. The accent never appears as a status. Status semantics are independent of brand accent. This was originally coral (`#d97757`); the swap separates action affordances from the amber status family (starting/stopping `#D97706`, idle `#CA8A04`) that previously sat in the same warm-orange band as the accent.
+**Cool blue accent (`#498DFA`) is the product action color** — "Open", "Start", "New workspace", primary CTAs. The accent never appears as a status. Status semantics are independent of brand accent. This was originally coral (`#d97757`); the swap separates action affordances from the amber status family (starting/stopping `#FF8040`, idle `#D6A136`) that previously sat in the same warm-orange band as the accent.
 
 **Data viz palette:**
 - Single-line charts: accent (blue)
@@ -103,7 +109,7 @@ A leaves no portfolio continuity — every project reads as a one-off execution.
 
 ### Default theme
 
-Light primary (warm cream). B2B convention for admin dashboards; better readability for dense data over long sessions. Dark mode is a toggle, prioritized for stretch time but not blocking.
+Light primary (cool gray-blue, per the diverged palette above). B2B convention for admin dashboards; better readability for dense data over long sessions. Dark mode is a toggle, prioritized for stretch time but not blocking.
 
 ## What this rules out
 
@@ -116,4 +122,4 @@ Light primary (warm cream). B2B convention for admin dashboards; better readabil
 
 ## Cross-portfolio note
 
-This direction reuses tokens from ReMargin. The README will mention this explicitly as a continuity choice — a personal design system applied across two projects. Framing matters here: this is "I bring a system to my work", not "I reused what I had". The system was extended for this product's job, not pasted in.
+This direction reuses tokens from ReMargin — the type system, dark surfaces, weights, scale, and motion are unchanged. The light surface temperature was swept after the accent moved to cool blue (see "Light theme palette — diverged from ReMargin" above) and re-referenced against Integrity, a peer operational-tool case study. The README will mention this explicitly as a continuity choice — a personal design system applied across projects, diverged where the product's job called for it. Framing matters here: this is "I bring a system to my work, and I know when to break it", not "I reused what I had".
