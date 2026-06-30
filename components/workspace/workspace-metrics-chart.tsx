@@ -66,7 +66,7 @@ export function WorkspaceMetricsChart({ id }: { id: string }) {
         />
         <ChartPanel
           title="Memory"
-          color="#14b8a6"
+          color="#0ea5a4"
           data={data?.memory}
           loading={isPending}
         />

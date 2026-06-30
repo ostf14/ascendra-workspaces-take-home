@@ -51,7 +51,7 @@ A leaves no portfolio continuity — every project reads as a one-off execution.
 - **Border alpha pattern over surfaces**: rgba(255,255,255,0.13 / 0.2 / 0.07)
 - **Light theme — warm cream**: #fdfcf5 page / #f5efdf secondary / #ebe6d6 tertiary / #ffffff elevated
 - **Light text scale**: #3d3a34 → #524e46 → #787570 → #a8a39a
-- **Coral accent**: #d97757 (scope redefined below)
+- **Cool blue accent**: `#498DFA` — selected after visual review; coral (`#d97757`, the ReMargin original) was visually competing with amber status colors in the same warm-orange band. Hover state: `#3878E0`. Muted alpha: `rgba(73,141,250,0.12)` light / `0.15` dark. (Scope redefined below.)
 
 ### Removed (not applicable to a dashboard)
 
@@ -72,11 +72,11 @@ A leaves no portfolio continuity — every project reads as a one-off execution.
 | Error | `#DC2626` | Warm red, not aggressive |
 | Idle | `#CA8A04` | Deeper amber — distinct from starting |
 
-**Coral accent (`#d97757`) keeps its meaning as product action color** — "Open in IDE", "New workspace", primary CTAs. Coral never appears as a status. Status semantics are independent of brand accent.
+**Cool blue accent (`#498DFA`) is the product action color** — "Open", "Start", "New workspace", primary CTAs. The accent never appears as a status. Status semantics are independent of brand accent. This was originally coral (`#d97757`); the swap separates action affordances from the amber status family (starting/stopping `#D97706`, idle `#CA8A04`) that previously sat in the same warm-orange band as the accent.
 
 **Data viz palette:**
-- Single-line charts: coral accent
-- Two-series (CPU vs memory): coral + `#14B8A6` (teal complement — finalised side-by-side with coral in code)
+- Single-line charts: accent (blue)
+- Two-series (CPU vs memory): blue + `#0EA5A4` (teal complement — verified side-by-side with the new accent in code; reads as cool-against-cool, distinct hue separation)
 - Max three series per chart
 - Grid lines: `--border-subtle` (rgba alpha 0.07)
 - No standalone legends if avoidable; inline label in chart title or tooltip

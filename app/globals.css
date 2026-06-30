@@ -52,8 +52,6 @@
   --color-secondary-foreground: var(--text-primary);
   --color-muted: var(--surface-secondary);
   --color-muted-foreground: var(--text-tertiary);
-  --color-accent: var(--surface-secondary);
-  --color-accent-foreground: var(--text-primary);
   --color-destructive: var(--status-error);
   --color-destructive-foreground: #ffffff;
   --color-border: var(--border-default);
@@ -74,6 +72,17 @@
   --color-border-strong: var(--border-strong);
   --color-border-subtle: var(--border-subtle);
 
+  /* Brand action accent — cool blue per decision 05. The variable is
+     --color-accent so callers use bg-accent / text-accent / ring-accent.
+     Shadcn primitives that previously used bg-accent for hover surfaces
+     were remapped to bg-muted (components/ui/select.tsx, dropdown-menu.tsx,
+     context-menu.tsx) so the brand color doesn't bleed into menu hover. */
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-accent-foreground: var(--accent-foreground);
+  /* legacy alias — original ReMargin token name; same value (now blue) so
+     existing accent-coral classes keep rendering. */
   --color-accent-coral: var(--accent);
   --color-accent-coral-foreground: var(--accent-foreground);
 
@@ -108,7 +117,9 @@
   --border-strong: rgba(61, 58, 52, 0.22);
   --border-subtle: rgba(61, 58, 52, 0.07);
 
-  --accent: #d97757;
+  --accent: #498dfa;
+  --accent-hover: #3878e0;
+  --accent-muted: rgba(73, 141, 250, 0.12);
   --accent-foreground: #ffffff;
 
   --status-running: #10b981;
@@ -132,7 +143,9 @@
   --border-strong: rgba(255, 255, 255, 0.2);
   --border-subtle: rgba(255, 255, 255, 0.07);
 
-  --accent: #d97757;
+  --accent: #498dfa;
+  --accent-hover: #3878e0;
+  --accent-muted: rgba(73, 141, 250, 0.15);
   --accent-foreground: #ffffff;
 
   --status-running: #10b981;

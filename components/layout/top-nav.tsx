@@ -38,7 +38,7 @@ export function TopNav() {
           >
             <span
               aria-hidden
-              className="inline-block size-2 rounded-full bg-accent-coral"
+              className="inline-block size-2 rounded-full bg-accent"
             />
             <span>Ascendra</span>
           </Link>
