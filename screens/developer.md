@@ -24,9 +24,8 @@ Home page for the developer. First view after sign-in.
 - Status badge
 - Template name
 - Idle pill below the template name when `isIdle` — "Idle · 38h" in the idle status color (`#CA8A04`)
-- Current usage — CPU%, memory%, disk%, compact with optional sparklines
+- Current usage — three circular gauges (CPU / Memory / Disk) with threshold-aware fill colour (neutral / amber / red)
 - Action group at the bottom — see the state machine below
-- Hourly cost label on the right of the footer (mono, `--text-tertiary`)
 
 **Page chrome:**
 - "New workspace" button (top right)
@@ -107,6 +106,7 @@ Not a screen. UI behaviour shared across both screens.
 - **ConnectPanel** — three connect actions (see decision 02).
 - **WorkspaceCard** — list item on screen 1.
 - **TemplateCard** — used in flow 1; reused in the admin templates view.
+- **UsageCircle** — small SVG donut with threshold-colored fill, used on the developer card for compact resource indication. 36px diameter, 1.5px stroke, neutral / amber / red thresholds at 60% / 85%.
 - **WorkspaceActionsMenu** — shared menu used by the kebab `DropdownMenu` and the right-click `ContextMenu` wrapper on the card. Items: Rename, Duplicate, Copy ID, separator, Delete (destructive).
 
 ## Flow 3 — Workspace actions

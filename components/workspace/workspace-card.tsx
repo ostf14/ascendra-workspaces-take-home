@@ -6,7 +6,7 @@ import { useState } from "react";
 import { IdlePill } from "@/components/workspace/idle-pill";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StatusBadge } from "@/components/workspace/status-badge";
-import { UsageMetric } from "@/components/workspace/usage-metric";
+import { UsageCircle } from "@/components/workspace/usage-circle";
 import { WorkspaceActionsContext } from "@/components/workspace/workspace-actions-menu";
 import { WorkspacePreviewSheet } from "@/components/workspace/workspace-preview-sheet";
 import type { VM } from "@/lib/domain/types";
@@ -42,10 +42,10 @@ export function WorkspaceCard({ workspace }: { workspace: VM }) {
             <StatusBadge status={workspace.status} />
           </header>
 
-          <div className="grid grid-cols-3 gap-3">
-            <UsageMetric label="CPU" value={workspace.cpu} compact />
-            <UsageMetric label="Memory" value={workspace.memory} compact />
-            <UsageMetric label="Disk" value={workspace.disk} compact />
+          <div className="flex items-start justify-around gap-6 py-1">
+            <UsageCircle label="CPU" value={workspace.cpu} />
+            <UsageCircle label="Memory" value={workspace.memory} />
+            <UsageCircle label="Disk" value={workspace.disk} />
           </div>
         </Link>
 
