@@ -6,13 +6,30 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import type { VM } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
+// Static-looking log stream — timestamps + INFO/WARN levels give the panel
+// a believable feel when expanded. The mock backend doesn't emit real logs;
+// the line shape matches what code-server / Coder emit in practice.
 const SAMPLE_LOGS = [
-  "[boot] kernel 6.6.42 ready",
-  "[runtime] starting code-server@4.93.0",
-  "[net] tunnel established",
-  "[runtime] code-server listening on :8080",
-  "[idle] watching for inactivity",
+  "12:34:56 INFO  boot    kernel 6.6.42 ready",
+  "12:34:57 INFO  agent   starting code-server@4.93.0",
+  "12:34:58 INFO  net     tunnel established",
+  "12:34:59 INFO  agent   code-server listening on :8080",
+  "12:35:14 WARN  health  response 1.2s above 800ms target",
+  "12:35:30 INFO  idle    watching for inactivity (30m threshold)",
+  "12:36:02 INFO  fs      snapshot complete (2.4 GB)",
+  "12:36:18 WARN  net     retry on flaky upstream (1/3)",
 ];
+
+function buildLines(workspace: VM): string[] {
+  if (workspace.status === "error" && workspace.errorReason) {
+    return [
+      ...SAMPLE_LOGS.slice(0, 4),
+      `12:35:02 WARN  agent   provisioning slow, retrying`,
+      `12:35:21 ERROR boot    ${workspace.errorReason}`,
+    ];
+  }
+  return SAMPLE_LOGS;
+}
 
 export function WorkspaceLogs({
   workspace,
@@ -22,9 +39,7 @@ export function WorkspaceLogs({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const lines = workspace.status === "error" && workspace.errorReason
-    ? [...SAMPLE_LOGS.slice(0, 2), `[error] ${workspace.errorReason}`]
-    : SAMPLE_LOGS;
+  const lines = buildLines(workspace);
 
   return (
     <section
