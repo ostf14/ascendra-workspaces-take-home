@@ -107,6 +107,16 @@ Not a screen. UI behaviour shared across both screens.
 - **ConnectPanel** — three connect actions (see decision 02).
 - **WorkspaceCard** — list item on screen 1.
 - **TemplateCard** — used in flow 1; reused in the admin templates view.
+- **WorkspaceActionsMenu** — shared menu used by the kebab `DropdownMenu` and the right-click `ContextMenu` wrapper on the card. Items: Rename, Duplicate, Copy ID, separator, Delete (destructive).
+
+## Flow 3 — Workspace actions
+
+Triggered from the kebab in the action group **or** by right-clicking anywhere on a workspace card. Same set of items either way:
+
+1. **Rename** → opens a dialog with the current name pre-filled. Submit calls `PATCH /api/workspaces/:id` with `{ name }`. Validation is slug-shape, 1–50 characters, letters / digits / hyphens. List + detail invalidate so the new name shows everywhere it's rendered.
+2. **Duplicate** → calls `POST /api/workspaces/:id/duplicate`. The mock backend clones the template + owner, autogenerates a Coder-style name, and returns a fresh workspace in `starting`. The client navigates to the duplicate's detail page so the user watches it come up.
+3. **Copy ID** → writes `workspace.id` to the clipboard and toasts "Workspace ID copied".
+4. **Delete** → existing typed-name confirmation modal. Destructive register; separated from the safe actions.
 
 ## States to handle
 

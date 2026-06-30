@@ -153,6 +153,16 @@ export const createWorkspaceRequestSchema = z.object({
   name: z.string().min(1).max(64),
 });
 
+// Rename: same slug shape as the auto-generator (lowercase letters, digits,
+// hyphens). 1-50 chars per the actions menu contract.
+export const renameWorkspaceRequestSchema = z.object({
+  name: z
+    .string()
+    .min(1)
+    .max(50)
+    .regex(/^[a-zA-Z0-9-]+$/),
+});
+
 export const adminCreateWorkspaceRequestSchema =
   createWorkspaceRequestSchema.extend({
     ownerId: z.string().min(1),

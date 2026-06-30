@@ -888,6 +888,45 @@ export function deleteWorkspace(id: string): boolean {
   return true;
 }
 
+export function renameWorkspace(id: string, name: string): VM | undefined {
+  const w = workspaces.find((x) => x.id === id);
+  if (!w) return undefined;
+  w.name = name;
+  usedNames.add(name);
+  return { ...w };
+}
+
+export function duplicateWorkspace(id: string): VM | undefined {
+  const original = workspaces.find((x) => x.id === id);
+  if (!original) return undefined;
+  const name = generateUniqueWorkspaceName(usedNames, rng);
+  usedNames.add(name);
+  const newId = `vm-dup-${Date.now().toString(36)}`;
+  const tpl = templateById(original.templateId);
+  const vm: VM = {
+    id: newId,
+    name,
+    ownerId: original.ownerId,
+    templateId: original.templateId,
+    templateName: original.templateName,
+    status: "starting",
+    cpu: 0,
+    memory: 0,
+    disk: 12,
+    vcpu: tpl.vcpu,
+    memoryGb: tpl.memoryGb,
+    diskGb: tpl.diskGb,
+    region: original.region,
+    hourlyCost: original.hourlyCost,
+    createdAt: new Date().toISOString(),
+    lastActiveAt: new Date().toISOString(),
+    isIdle: false,
+  };
+  workspaces.unshift(vm);
+  scheduleTransition(newId, "running");
+  return { ...vm };
+}
+
 export function buildWorkspaceMetrics(
   id: string,
   range: WorkspaceMetricsRange

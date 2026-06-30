@@ -2,18 +2,20 @@ import { z } from "zod";
 
 import {
   createWorkspaceRequestSchema,
+  renameWorkspaceRequestSchema,
   vmSchema,
   workspaceMetricsRangeSchema,
   workspaceMetricsSchema,
 } from "@/lib/domain/schemas";
 import type {
   CreateWorkspaceRequest,
+  RenameWorkspaceRequest,
   VM,
   WorkspaceMetrics,
   WorkspaceMetricsRange,
 } from "@/lib/domain/types";
 
-import { apiDelete, apiGet, apiPost } from "./client";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./client";
 
 const workspaceListSchema = z.array(vmSchema);
 const suggestNameSchema = z.object({ name: z.string().min(1) });
@@ -63,4 +65,16 @@ export function restartWorkspace(id: string): Promise<VM> {
 
 export function deleteWorkspace(id: string): Promise<void> {
   return apiDelete(`/api/workspaces/${encodeURIComponent(id)}`);
+}
+
+export function renameWorkspace(id: string, input: RenameWorkspaceRequest): Promise<VM> {
+  return apiPatch(
+    `/api/workspaces/${encodeURIComponent(id)}`,
+    vmSchema,
+    renameWorkspaceRequestSchema.parse(input)
+  );
+}
+
+export function duplicateWorkspace(id: string): Promise<VM> {
+  return apiPost(`/api/workspaces/${encodeURIComponent(id)}/duplicate`, vmSchema);
 }

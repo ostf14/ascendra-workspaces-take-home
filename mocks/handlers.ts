@@ -7,6 +7,7 @@ import {
   createWorkspaceRequestSchema,
   adminCreateWorkspaceRequestSchema,
   createTemplateRequestSchema,
+  renameWorkspaceRequestSchema,
   updateTemplateRequestSchema,
 } from "@/lib/domain/schemas";
 
@@ -18,6 +19,7 @@ import {
   createTemplate,
   createWorkspace,
   deleteWorkspace,
+  duplicateWorkspace,
   getCurrentUser,
   getTemplate,
   getWorkspace,
@@ -25,6 +27,7 @@ import {
   listOwnWorkspaces,
   listTemplates,
   listUsers,
+  renameWorkspace,
   restartWorkspace,
   startWorkspace,
   stopWorkspace,
@@ -112,6 +115,23 @@ export const handlers = [
     const ok = deleteWorkspace(String(params.id));
     if (!ok) return notFound("Workspace not found");
     return new HttpResponse(null, { status: 204 });
+  }),
+
+  http.patch("/api/workspaces/:id", async ({ params, request }) => {
+    await delay();
+    const body = await request.json();
+    const parsed = renameWorkspaceRequestSchema.safeParse(body);
+    if (!parsed.success) return badRequest("Invalid rename payload");
+    const w = renameWorkspace(String(params.id), parsed.data.name);
+    if (!w) return notFound("Workspace not found");
+    return HttpResponse.json(w);
+  }),
+
+  http.post("/api/workspaces/:id/duplicate", async ({ params }) => {
+    await delay();
+    const w = duplicateWorkspace(String(params.id));
+    if (!w) return notFound("Workspace not found");
+    return HttpResponse.json(w, { status: 201 });
   }),
 
   http.get("/api/admin/overview", async () => {

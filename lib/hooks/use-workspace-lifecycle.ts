@@ -7,12 +7,15 @@ import { ApiError } from "@/lib/api/client";
 import {
   createWorkspace,
   deleteWorkspace,
+  duplicateWorkspace,
+  renameWorkspace,
   restartWorkspace,
   startWorkspace,
   stopWorkspace,
 } from "@/lib/api/workspaces";
 import type {
   CreateWorkspaceRequest,
+  RenameWorkspaceRequest,
   VM,
   VMStatus,
 } from "@/lib/domain/types";
@@ -175,6 +178,54 @@ export function useCreateWorkspace() {
       markTransitionStarted(workspace.id);
     },
     onError: (error) => reportError(error, "Could not create workspace"),
+    onSettled: () => invalidate(queryClient),
+  });
+}
+
+export function useRenameWorkspace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, input }: { id: string; input: RenameWorkspaceRequest }) =>
+      renameWorkspace(id, input),
+    onMutate: async ({ id, input }) => {
+      await queryClient.cancelQueries({ queryKey: workspacesKeys.list() });
+      await queryClient.cancelQueries({ queryKey: workspacesKeys.detail(id) });
+      const previousList = queryClient.getQueryData<VM[]>(workspacesKeys.list());
+      const previousDetail = queryClient.getQueryData<VM>(workspacesKeys.detail(id));
+      if (previousList) {
+        queryClient.setQueryData<VM[]>(
+          workspacesKeys.list(),
+          previousList.map((w) => (w.id === id ? { ...w, name: input.name } : w))
+        );
+      }
+      if (previousDetail) {
+        queryClient.setQueryData<VM>(workspacesKeys.detail(id), {
+          ...previousDetail,
+          name: input.name,
+        });
+      }
+      return { previousList, previousDetail } satisfies LifecycleContext;
+    },
+    onError: (error, { id }, context) => {
+      rollback(queryClient, id, context);
+      reportError(error, "Could not rename workspace");
+    },
+    onSettled: (_data, _error, { id }) => invalidate(queryClient, id),
+  });
+}
+
+export function useDuplicateWorkspace() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => duplicateWorkspace(id),
+    onSuccess: (workspace) => {
+      queryClient.setQueryData<VM[]>(workspacesKeys.list(), (prev) =>
+        prev ? [workspace, ...prev] : [workspace]
+      );
+      queryClient.setQueryData(workspacesKeys.detail(workspace.id), workspace);
+      markTransitionStarted(workspace.id);
+    },
+    onError: (error) => reportError(error, "Could not duplicate workspace"),
     onSettled: () => invalidate(queryClient),
   });
 }

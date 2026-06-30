@@ -11,6 +11,7 @@ import type {
   fleetSortKeySchema,
   fleetUtilizationRangeSchema,
   fleetUtilizationSchema,
+  renameWorkspaceRequestSchema,
   sortOrderSchema,
   templateUsageStatsSchema,
   templateWithUsageSchema,
@@ -48,6 +49,7 @@ export type TemplateWithUsage = z.infer<typeof templateWithUsageSchema>;
 export type FleetInventoryItem = z.infer<typeof fleetInventoryItemSchema>;
 
 export type CreateWorkspaceRequest = z.infer<typeof createWorkspaceRequestSchema>;
+export type RenameWorkspaceRequest = z.infer<typeof renameWorkspaceRequestSchema>;
 export type AdminCreateWorkspaceRequest = z.infer<
   typeof adminCreateWorkspaceRequestSchema
 >;

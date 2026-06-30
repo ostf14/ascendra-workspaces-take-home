@@ -8,16 +8,9 @@ import {
   Play,
   RotateCcw,
   SquareArrowOutUpRight,
-  Trash2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -30,10 +23,9 @@ import {
 } from "@/lib/hooks/use-workspace-lifecycle";
 import type { VM } from "@/lib/domain/types";
 import { useTransitionProgress } from "@/lib/transition-tracker";
-import { cn } from "@/lib/utils";
 
-import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
 import { RecreateWorkspaceDialog } from "./recreate-workspace-dialog";
+import { WorkspaceActionsDropdown } from "./workspace-actions-menu";
 
 const HINTS = {
   start: "Resumes from the saved disk. Files and settings preserved.",
@@ -65,7 +57,6 @@ export function LifecycleControls({
   redirectAfterDelete?: boolean;
   onOpen?: () => void;
 }) {
-  const [deleteOpen, setDeleteOpen] = useState(false);
   const [recreateOpen, setRecreateOpen] = useState(false);
 
   const start = useStartWorkspace();
@@ -183,8 +174,10 @@ export function LifecycleControls({
 
       {/* Kebab — hidden during transitions */}
       {!isTransitional ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <WorkspaceActionsDropdown
+          workspace={workspace}
+          redirectAfterDelete={redirectAfterDelete}
+          trigger={
             <Button
               size={kebabSize}
               variant="ghost"
@@ -192,28 +185,10 @@ export function LifecycleControls({
             >
               <MoreHorizontal className="size-4" strokeWidth={1.5} />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuItem
-              onClick={() => setDeleteOpen(true)}
-              className={cn(
-                "text-status-error focus:bg-status-error/10 focus:text-status-error",
-                "data-[highlighted]:text-status-error data-[highlighted]:bg-status-error/10"
-              )}
-            >
-              <Trash2 className="size-4" strokeWidth={1.5} />
-              Delete workspace
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          }
+        />
       ) : null}
 
-      <DeleteWorkspaceDialog
-        workspace={workspace}
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        redirectAfterDelete={redirectAfterDelete}
-      />
       <RecreateWorkspaceDialog
         workspace={workspace}
         open={recreateOpen}
