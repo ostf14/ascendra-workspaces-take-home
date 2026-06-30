@@ -1,83 +1,77 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
-import { parseISO } from "date-fns";
 
+import {
+  EXPECTED_TRANSITION_SECONDS,
+  STARTING_STEPS,
+  STOPPING_STEPS,
+} from "@/lib/constants";
+import { useTransitionProgress } from "@/lib/transition-tracker";
 import type { VM } from "@/lib/domain/types";
 import { cn } from "@/lib/utils";
 
-const STEPS = [
-  { label: "Provisioning VM", durationSeconds: 3 },
-  { label: "Pulling image", durationSeconds: 4 },
-  { label: "Installing dependencies", durationSeconds: 4 },
-  { label: "Starting services", durationSeconds: 3 },
-] as const;
+type Verb = "Starting" | "Stopping";
 
-const TOTAL = STEPS.reduce((acc, step) => acc + step.durationSeconds, 0);
+function statusToVerb(status: VM["status"]): Verb | null {
+  if (status === "starting") return "Starting";
+  if (status === "stopping") return "Stopping";
+  return null;
+}
 
-function describeStep(elapsedSeconds: number): {
-  currentIndex: number;
-  progress: number;
-} {
-  let cumulative = 0;
-  for (let i = 0; i < STEPS.length; i += 1) {
-    const step = STEPS[i];
-    if (!step) continue;
-    cumulative += step.durationSeconds;
-    if (elapsedSeconds < cumulative) {
-      const into = elapsedSeconds - (cumulative - step.durationSeconds);
-      return { currentIndex: i, progress: into / step.durationSeconds };
-    }
-  }
-  return { currentIndex: STEPS.length - 1, progress: 1 };
+function stepsFor(verb: Verb): readonly string[] {
+  return verb === "Starting" ? STARTING_STEPS : STOPPING_STEPS;
+}
+
+function currentStepIndex(verb: Verb, elapsedSeconds: number): number {
+  const steps = stepsFor(verb);
+  const perStep = EXPECTED_TRANSITION_SECONDS / steps.length;
+  const index = Math.floor(elapsedSeconds / perStep);
+  return Math.min(index, steps.length - 1);
 }
 
 function formatElapsed(seconds: number): string {
-  if (seconds < 60) return `${Math.floor(seconds)}s elapsed`;
+  if (seconds < 60) return `${seconds}s elapsed`;
   const minutes = Math.floor(seconds / 60);
-  const remaining = Math.floor(seconds - minutes * 60);
-  return `${minutes}m ${remaining}s elapsed`;
+  const rest = seconds - minutes * 60;
+  return `${minutes}m ${rest}s elapsed`;
 }
 
 export function StartingProgress({ workspace }: { workspace: VM }) {
-  const isStarting = workspace.status === "starting";
-  const startedAt = parseISO(workspace.lastActiveAt);
-  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
-    Math.max(0, (Date.now() - startedAt.getTime()) / 1000)
-  );
+  const verb = statusToVerb(workspace.status);
+  const progress = useTransitionProgress(workspace.id);
 
-  useEffect(() => {
-    if (!isStarting) return;
-    const id = window.setInterval(() => {
-      setElapsedSeconds(Math.max(0, (Date.now() - startedAt.getTime()) / 1000));
-    }, 1000);
-    return () => window.clearInterval(id);
-  }, [isStarting, startedAt]);
-
-  if (!isStarting) return null;
-
-  const { currentIndex } = describeStep(Math.min(elapsedSeconds, TOTAL));
+  if (!verb) return null;
+  const steps = stepsFor(verb);
+  const elapsedSeconds = progress.started ? progress.elapsedSeconds : 0;
+  const currentIndex = currentStepIndex(verb, elapsedSeconds);
+  const remainingLabel = progress.started
+    ? progress.almostDone
+      ? "almost done…"
+      : `~${progress.secondsRemaining}s remaining`
+    : `~${EXPECTED_TRANSITION_SECONDS}s remaining`;
 
   return (
     <section
       aria-live="polite"
-      aria-label="Starting workspace"
+      aria-label={`${verb} workspace`}
       className="rounded-lg border border-border-default bg-surface-secondary p-5"
     >
       <header className="flex items-baseline justify-between gap-3">
-        <h2 className="text-sm font-medium text-text-primary">Starting workspace</h2>
+        <h2 className="text-sm font-medium text-text-primary">
+          {verb} workspace
+        </h2>
         <span className="font-mono text-xs text-text-tertiary">
-          {formatElapsed(elapsedSeconds)}
+          {formatElapsed(elapsedSeconds)} · {remainingLabel}
         </span>
       </header>
       <ol className="mt-4 flex flex-col gap-2">
-        {STEPS.map((step, index) => {
+        {steps.map((label, index) => {
           const isComplete = index < currentIndex;
           const isCurrent = index === currentIndex;
           return (
             <li
-              key={step.label}
+              key={label}
               className={cn(
                 "flex items-center gap-3 rounded-md px-2 py-1.5 text-sm transition-colors",
                 isCurrent && "bg-surface-elevated"
@@ -110,7 +104,7 @@ export function StartingProgress({ workspace }: { workspace: VM }) {
                       : "text-text-tertiary"
                 )}
               >
-                {step.label}
+                {label}
               </span>
             </li>
           );

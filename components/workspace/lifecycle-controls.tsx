@@ -29,6 +29,7 @@ import {
   useStopWorkspace,
 } from "@/lib/hooks/use-workspace-lifecycle";
 import type { VM } from "@/lib/domain/types";
+import { useTransitionProgress } from "@/lib/transition-tracker";
 import { cn } from "@/lib/utils";
 
 import { DeleteWorkspaceDialog } from "./delete-workspace-dialog";
@@ -75,6 +76,13 @@ export function LifecycleControls({
   const kebabSize = variant === "card" ? "sm" : "icon";
   const status = workspace.status;
   const isTransitional = status === "starting" || status === "stopping";
+  const progress = useTransitionProgress(workspace.id);
+
+  const transitionalLabel = (verb: "Starting" | "Stopping") => {
+    if (!progress.started) return `${verb}…`;
+    if (progress.almostDone) return `${verb} · almost done…`;
+    return `${verb} · ~${progress.secondsRemaining}s`;
+  };
 
   const onStart = () => start.mutate(workspace.id);
   const onStop = () => stop.mutate(workspace.id);
@@ -111,14 +119,14 @@ export function LifecycleControls({
       {status === "starting" ? (
         <Button size={buttonSize} variant="default" disabled>
           <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
-          Starting…
+          {transitionalLabel("Starting")}
         </Button>
       ) : null}
 
       {status === "stopping" ? (
         <Button size={buttonSize} variant="default" disabled>
           <Loader2 className="size-4 animate-spin" strokeWidth={1.5} />
-          Stopping…
+          {transitionalLabel("Stopping")}
         </Button>
       ) : null}
 

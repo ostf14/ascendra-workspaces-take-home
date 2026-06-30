@@ -16,6 +16,10 @@ import type {
   VM,
   VMStatus,
 } from "@/lib/domain/types";
+import {
+  clearTransition,
+  markTransitionStarted,
+} from "@/lib/transition-tracker";
 
 import { adminKeys, workspacesKeys } from "./keys";
 
@@ -86,10 +90,12 @@ export function useStartWorkspace() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: workspacesKeys.list() });
       await queryClient.cancelQueries({ queryKey: workspacesKeys.detail(id) });
+      markTransitionStarted(id);
       return applyOptimisticStatus(queryClient, id, "starting");
     },
     onError: (error, id, context) => {
       rollback(queryClient, id, context);
+      clearTransition(id);
       reportError(error, "Could not start workspace");
     },
     onSettled: (_data, _error, id) => invalidate(queryClient, id),
@@ -103,10 +109,12 @@ export function useStopWorkspace() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: workspacesKeys.list() });
       await queryClient.cancelQueries({ queryKey: workspacesKeys.detail(id) });
+      markTransitionStarted(id);
       return applyOptimisticStatus(queryClient, id, "stopping");
     },
     onError: (error, id, context) => {
       rollback(queryClient, id, context);
+      clearTransition(id);
       reportError(error, "Could not stop workspace");
     },
     onSettled: (_data, _error, id) => invalidate(queryClient, id),
@@ -120,6 +128,7 @@ export function useRestartWorkspace() {
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: workspacesKeys.list() });
       await queryClient.cancelQueries({ queryKey: workspacesKeys.detail(id) });
+      markTransitionStarted(id);
       return applyOptimisticStatus(queryClient, id, "starting");
     },
     onError: (error, id, context) => {
@@ -163,6 +172,7 @@ export function useCreateWorkspace() {
         prev ? [workspace, ...prev] : [workspace]
       );
       queryClient.setQueryData(workspacesKeys.detail(workspace.id), workspace);
+      markTransitionStarted(workspace.id);
     },
     onError: (error) => reportError(error, "Could not create workspace"),
     onSettled: () => invalidate(queryClient),

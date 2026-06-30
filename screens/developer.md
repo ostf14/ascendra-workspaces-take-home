@@ -96,6 +96,8 @@ Not a screen. UI behaviour shared across both screens.
 - Buttons that don't apply in the transitional state are disabled.
 - On success, status moves to the terminal state.
 - On failure, status flips to `error` with a brief reason and a retry action.
+- During transitions, the primary pseudo-button label shows estimated time remaining (`Starting · ~12s`, decrementing every second). On the detail page the labelled step indicator also surfaces `~Xs remaining`. Once elapsed has crossed the expected window (`EXPECTED_TRANSITION_SECONDS = 12`), both switch to `almost done…`. The expected duration is the mid of the mock 8-15s window; cold provisioning lands in the "almost done" branch which is the honest reading — we don't fake a percent number.
+- Stopping uses its own labelled steps on the detail page: `Stopping services → Persisting state → Shutting down VM`.
 
 ## Component inventory
 
