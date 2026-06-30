@@ -93,7 +93,10 @@ function templateById(id: string): VMTemplate {
   return t;
 }
 
+// Default acting user. Reviewers can switch via the X-Acting-User header
+// that the API client injects from localStorage — see README.
 export const ACTING_USER_ID = "user-alex";
+export const ACTING_USER_HEADER = "x-acting-user";
 
 const USERS: User[] = [
   { id: ACTING_USER_ID, name: "Alex Morgan", email: "alex@ascendra.dev", role: "admin" },
@@ -118,9 +121,13 @@ const USERS: User[] = [
   { id: "user-theo", name: "Theo Almeida", email: "theo@ascendra.dev", role: "engineer" },
 ];
 
-const NON_ACTING_USER_IDS = USERS.filter((u) => u.id !== ACTING_USER_ID).map(
-  (u) => u.id
-);
+// Exclude the demo engineer (user-sam) so swapping the acting user to him
+// shows a real empty state — the role-gating demo lands on the onboarding
+// affordance from screens/developer.md.
+const ROUND_ROBIN_EXCLUDED = new Set([ACTING_USER_ID, "user-sam"]);
+const NON_ACTING_USER_IDS = USERS.filter(
+  (u) => !ROUND_ROBIN_EXCLUDED.has(u.id)
+).map((u) => u.id);
 
 function userById(id: string): User {
   const u = USERS.find((user) => user.id === id);
@@ -641,8 +648,15 @@ export function listUsers(): User[] {
   return USERS.map((u) => ({ ...u }));
 }
 
-export function getCurrentUser(): User {
-  return { ...userById(ACTING_USER_ID) };
+export function resolveActingUserId(request?: Request): string {
+  if (!request) return ACTING_USER_ID;
+  const header = request.headers.get(ACTING_USER_HEADER);
+  if (header && USERS.some((u) => u.id === header)) return header;
+  return ACTING_USER_ID;
+}
+
+export function getCurrentUser(request?: Request): User {
+  return { ...userById(resolveActingUserId(request)) };
 }
 
 export function listTemplates(): TemplateWithUsage[] {
@@ -705,10 +719,11 @@ export function updateTemplate(
   };
 }
 
-export function listOwnWorkspaces(): VM[] {
+export function listOwnWorkspaces(request?: Request): VM[] {
   tickTransitions();
+  const ownerId = resolveActingUserId(request);
   return workspaces
-    .filter((w) => w.ownerId === ACTING_USER_ID)
+    .filter((w) => w.ownerId === ownerId)
     .map((w) => ({ ...w }));
 }
 
@@ -791,9 +806,12 @@ type CreateWorkspaceInput = {
   ownerId?: string;
 };
 
-export function createWorkspace(input: CreateWorkspaceInput): VM {
+export function createWorkspace(
+  input: CreateWorkspaceInput,
+  request?: Request
+): VM {
   const template = templateById(input.templateId);
-  const ownerId = input.ownerId ?? ACTING_USER_ID;
+  const ownerId = input.ownerId ?? resolveActingUserId(request);
   const name = input.name ?? generateUniqueWorkspaceName(usedNames, rng);
   usedNames.add(name);
   const id = `vm-new-${Date.now().toString(36)}`;

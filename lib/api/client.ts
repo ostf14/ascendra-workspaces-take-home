@@ -18,6 +18,26 @@ type RequestOptions = {
   signal?: AbortSignal;
 };
 
+const ACTING_USER_STORAGE_KEY = "ascendra-acting-user";
+const ACTING_USER_HEADER = "x-acting-user";
+
+// Reviewers can preview the engineer surface without rebuilding: in DevTools,
+// localStorage.setItem("ascendra-acting-user", "user-sam") and reload. The
+// mock backend reads this header and serves /api/me + own workspaces accordingly.
+function injectActingUser(init: HeadersInit | undefined): HeadersInit | undefined {
+  if (typeof window === "undefined") return init;
+  let acting: string | null = null;
+  try {
+    acting = window.localStorage.getItem(ACTING_USER_STORAGE_KEY);
+  } catch {
+    // Storage may be disabled (e.g. cross-origin sandbox). Treat as default.
+  }
+  if (!acting) return init;
+  const headers = new Headers(init ?? {});
+  headers.set(ACTING_USER_HEADER, acting);
+  return headers;
+}
+
 async function readErrorBody(response: Response): Promise<ApiError> {
   let payload: unknown = undefined;
   try {
@@ -50,7 +70,11 @@ export async function apiGet<T>(
   schema: ZodType<T>,
   options?: RequestOptions
 ): Promise<T> {
-  const res = await fetch(path, { method: "GET", signal: options?.signal });
+  const res = await fetch(path, {
+    method: "GET",
+    headers: injectActingUser(undefined),
+    signal: options?.signal,
+  });
   return parseResponse(res, schema);
 }
 
@@ -60,9 +84,11 @@ export async function apiPost<T>(
   body?: unknown,
   options?: RequestOptions
 ): Promise<T> {
+  const baseHeaders: HeadersInit | undefined =
+    body !== undefined ? { "content-type": "application/json" } : undefined;
   const res = await fetch(path, {
     method: "POST",
-    headers: body !== undefined ? { "content-type": "application/json" } : undefined,
+    headers: injectActingUser(baseHeaders),
     body: body !== undefined ? JSON.stringify(body) : undefined,
     signal: options?.signal,
   });
@@ -77,7 +103,7 @@ export async function apiPatch<T>(
 ): Promise<T> {
   const res = await fetch(path, {
     method: "PATCH",
-    headers: { "content-type": "application/json" },
+    headers: injectActingUser({ "content-type": "application/json" }),
     body: JSON.stringify(body),
     signal: options?.signal,
   });
@@ -85,6 +111,10 @@ export async function apiPatch<T>(
 }
 
 export async function apiDelete(path: string, options?: RequestOptions): Promise<void> {
-  const res = await fetch(path, { method: "DELETE", signal: options?.signal });
+  const res = await fetch(path, {
+    method: "DELETE",
+    headers: injectActingUser(undefined),
+    signal: options?.signal,
+  });
   if (!res.ok) throw await readErrorBody(res);
 }

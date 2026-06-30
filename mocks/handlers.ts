@@ -41,14 +41,14 @@ function badRequest(message = "Bad request") {
 }
 
 export const handlers = [
-  http.get("/api/me", async () => {
+  http.get("/api/me", async ({ request }) => {
     await delay();
-    return HttpResponse.json(getCurrentUser());
+    return HttpResponse.json(getCurrentUser(request));
   }),
 
-  http.get("/api/workspaces", async () => {
+  http.get("/api/workspaces", async ({ request }) => {
     await delay();
-    return HttpResponse.json(listOwnWorkspaces());
+    return HttpResponse.json(listOwnWorkspaces(request));
   }),
 
   http.get("/api/workspaces/suggest-name", async () => {
@@ -82,7 +82,7 @@ export const handlers = [
     const body = await request.json();
     const parsed = createWorkspaceRequestSchema.safeParse(body);
     if (!parsed.success) return badRequest("Invalid create payload");
-    const w = createWorkspace(parsed.data);
+    const w = createWorkspace(parsed.data, request);
     return HttpResponse.json(w, { status: 201 });
   }),
 
