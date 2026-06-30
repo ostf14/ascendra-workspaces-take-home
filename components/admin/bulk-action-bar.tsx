@@ -152,7 +152,7 @@ export function BulkActionBar({
                     confirm === "delete"
                       ? {
                           backgroundColor: "var(--status-error)",
-                          color: "#ffffff",
+                          color: "var(--color-destructive-foreground)",
                           borderColor: "var(--status-error)",
                         }
                       : undefined

@@ -73,7 +73,7 @@ export function AdminOverviewChart({
             <span
               aria-hidden
               className="inline-block size-2 rounded-full"
-              style={{ background: "#0ea5a4" }}
+              style={{ background: "var(--color-chart-2)" }}
             />
             Memory
           </li>
@@ -88,8 +88,8 @@ export function AdminOverviewChart({
                 <stop offset="100%" stopColor="var(--accent)" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="agg-memory" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#0ea5a4" stopOpacity={0.18} />
-                <stop offset="100%" stopColor="#0ea5a4" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--color-chart-2)" stopOpacity={0.18} />
+                <stop offset="100%" stopColor="var(--color-chart-2)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid
@@ -149,7 +149,7 @@ export function AdminOverviewChart({
                     <p className="flex items-center gap-2 font-mono text-text-primary">
                       <span
                         className="inline-block size-2 rounded-full"
-                        style={{ background: "#0ea5a4" }}
+                        style={{ background: "var(--color-chart-2)" }}
                       />
                       Memory {formatPercent(raw.memory)}
                     </p>
@@ -168,7 +168,7 @@ export function AdminOverviewChart({
             <Area
               type="monotone"
               dataKey="memory"
-              stroke="#0ea5a4"
+              stroke="var(--color-chart-2)"
               strokeWidth={1.5}
               fill="url(#agg-memory)"
               isAnimationActive={false}

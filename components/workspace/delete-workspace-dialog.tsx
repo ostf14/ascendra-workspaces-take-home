@@ -82,7 +82,7 @@ export function DeleteWorkspaceDialog({
             disabled={!canDelete || isPending}
             style={{
               backgroundColor: canDelete ? "var(--status-error)" : undefined,
-              color: canDelete ? "#ffffff" : undefined,
+              color: canDelete ? "var(--color-destructive-foreground)" : undefined,
               borderColor: canDelete ? "var(--status-error)" : undefined,
             }}
           >

@@ -93,7 +93,7 @@
   --color-status-idle: var(--status-idle);
 
   --color-chart-1: var(--accent);
-  --color-chart-2: #14b8a6;
+  --color-chart-2: #0ea5a4;
   --color-chart-3: var(--status-idle);
   --color-chart-4: var(--text-tertiary);
   --color-chart-5: var(--status-error);

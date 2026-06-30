@@ -8,8 +8,8 @@ const RADIUS = (SIZE - STROKE) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function colorForValue(value: number): string {
-  if (value >= 85) return "#DC2626";
-  if (value >= 60) return "#D97706";
+  if (value >= 85) return "var(--status-error)";
+  if (value >= 60) return "var(--status-pending)";
   return "var(--text-secondary)";
 }
 
