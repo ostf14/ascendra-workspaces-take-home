@@ -1,11 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import { use } from "react";
+import { ArrowLeft } from "lucide-react";
 
+import { Skeleton } from "@/components/ui/skeleton";
+import { ConnectPanel } from "@/components/workspace/connect-panel";
+import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
+import { StartingProgress } from "@/components/workspace/starting-progress";
+import { StatusBadge } from "@/components/workspace/status-badge";
+import { WorkspaceIdleHint } from "@/components/workspace/workspace-idle-hint";
+import { WorkspaceLogs } from "@/components/workspace/workspace-logs";
+import { WorkspaceMetadata } from "@/components/workspace/workspace-metadata";
+import { WorkspaceMetricsChart } from "@/components/workspace/workspace-metrics-chart";
 import { useWorkspace } from "@/lib/hooks/use-workspaces";
 
-// Phase 3 acceptance wiring: status-aware polling visible in raw JSON. Phase 4
-// replaces with the real detail UI from screens/developer.md.
 export default function WorkspaceDetailPage({
   params,
 }: {
@@ -15,20 +24,64 @@ export default function WorkspaceDetailPage({
   const { data, isPending } = useWorkspace(id);
 
   return (
-    <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-6 py-12">
-      <header className="flex flex-col gap-1">
-        <p className="text-xs uppercase tracking-[0.16em] text-text-tertiary">
-          Hook wiring · phase 3
-        </p>
-        <h1 className="font-mono text-lg text-text-primary">/workspaces/{id}</h1>
-      </header>
-      {isPending ? (
-        <p className="text-sm text-text-tertiary">Loading…</p>
+    <section className="mx-auto flex w-full max-w-[1240px] flex-col gap-6 px-6 py-10">
+      <Link
+        href="/workspaces"
+        className="inline-flex items-center gap-1.5 text-xs text-text-tertiary hover:text-text-primary"
+      >
+        <ArrowLeft className="size-3.5" strokeWidth={1.5} />
+        All workspaces
+      </Link>
+
+      {isPending || !data ? (
+        <DetailSkeleton />
       ) : (
-        <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-xs text-text-secondary">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+        <>
+          <header className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex flex-col gap-2">
+              <h1 className="font-mono text-lg text-text-primary">{data.name}</h1>
+              <div className="flex items-center gap-3">
+                <StatusBadge status={data.status} />
+                <span className="text-xs text-text-tertiary">
+                  {data.templateName}
+                </span>
+              </div>
+            </div>
+            <LifecycleControls workspace={data} redirectAfterDelete />
+          </header>
+
+          <WorkspaceIdleHint workspace={data} />
+          <StartingProgress workspace={data} />
+
+          <ConnectPanel workspace={data} />
+          <WorkspaceMetricsChart id={data.id} />
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
+            <WorkspaceMetadata workspace={data} />
+            <WorkspaceLogs workspace={data} defaultOpen={data.status === "error"} />
+          </div>
+        </>
       )}
     </section>
+  );
+}
+
+function DetailSkeleton() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-5 w-32" />
+        </div>
+        <Skeleton className="h-9 w-40" />
+      </div>
+      <Skeleton className="h-24 w-full" />
+      <Skeleton className="h-64 w-full" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">
+        <Skeleton className="h-48" />
+        <Skeleton className="h-48" />
+      </div>
+    </div>
   );
 }

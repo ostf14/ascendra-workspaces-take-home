@@ -1,32 +1,45 @@
 "use client";
 
+import Link from "next/link";
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { WorkspaceCard } from "@/components/workspace/workspace-card";
+import { WorkspacesEmptyState } from "@/components/workspace/workspaces-empty-state";
+import { WorkspacesListSkeleton } from "@/components/workspace/workspaces-list-skeleton";
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
 
-// Phase 3 acceptance wiring: hooks render raw JSON. Phase 4 replaces with the
-// real list UI from screens/developer.md.
 export default function WorkspacesPage() {
-  const { data, isPending, isError } = useWorkspaces();
+  const { data, isPending } = useWorkspaces();
+  const workspaces = data ?? [];
 
   return (
-    <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-6 py-12">
-      <header className="flex flex-col gap-1">
-        <p className="text-xs uppercase tracking-[0.16em] text-text-tertiary">
-          Hook wiring · phase 3
-        </p>
-        <h1 className="font-mono text-lg text-text-primary">/workspaces</h1>
-        <p className="text-sm text-text-secondary">
-          Raw data from <code className="font-mono">useWorkspaces()</code> while the
-          UI is being built.
-        </p>
+    <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-6 py-10">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-lg font-medium text-text-primary">Workspaces</h1>
+          <p className="text-sm text-text-secondary">
+            Your remote development environments.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/workspaces/new">
+            <Plus className="size-4" strokeWidth={1.5} />
+            New workspace
+          </Link>
+        </Button>
       </header>
+
       {isPending ? (
-        <p className="text-sm text-text-tertiary">Loading…</p>
-      ) : isError ? (
-        <p className="text-sm text-status-error">Failed to load workspaces.</p>
+        <WorkspacesListSkeleton />
+      ) : workspaces.length === 0 ? (
+        <WorkspacesEmptyState />
       ) : (
-        <pre className="overflow-auto rounded-md border border-border-default bg-surface-secondary p-4 text-xs text-text-secondary">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {workspaces.map((workspace) => (
+            <WorkspaceCard key={workspace.id} workspace={workspace} />
+          ))}
+        </div>
       )}
     </section>
   );
