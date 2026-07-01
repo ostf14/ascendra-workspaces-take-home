@@ -29,11 +29,11 @@ export function HeroMetric({
     >
       <p className="text-sm font-medium text-text-tertiary">{label}</p>
       {loading ? (
-        <Skeleton className="h-12 w-32" />
+        <Skeleton className="h-9 w-28" />
       ) : (
         <p
           className="font-mono font-medium tabular-nums text-text-primary"
-          style={{ fontSize: "var(--text-3xl)", lineHeight: "var(--text-3xl--line-height)" }}
+          style={{ fontSize: "var(--text-2xl)", lineHeight: "var(--text-2xl--line-height)" }}
         >
           {value}
         </p>

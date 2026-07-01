@@ -88,9 +88,9 @@ ReMargin's warm-cream light scope (`#fdfcf5` page, `#f5efdf` secondary, brown te
 - No standalone legends if avoidable; inline label in chart title or tooltip
 
 **Hero metric typography** (admin overview metric values like `$4,820`, `42 idle`):
-- New token `--text-3xl`: 48px
-- Style: **JetBrains Mono, weight 500** — gives system-generated voice. Distinct touch.
+- Value: `--text-2xl` (32px), JetBrains Mono, weight 500 — the earlier 48px (`--text-3xl`) read as marketing scale rather than dashboard scale, so the metric card values were dropped one step in the type scale. The `--text-3xl` token stays in globals.css for future use (splash surfaces, empty-state hero copy) but no admin surface currently paints at that size.
 - Label above metric: `--text-sm` (13px), weight 500, `--text-tertiary`
+- Delta strip below metric: `--text-xs` (11px), tertiary text for "vs last week", inline arrow + status color for the direction.
 
 **Table density spec** (admin inventory):
 - Row height: 36px default, 32px compact toggle
