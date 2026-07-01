@@ -64,7 +64,7 @@ function useWorkspaceActionsState(
   function runDuplicate() {
     duplicate.mutate(workspace.id, {
       onSuccess: (vm) => {
-        router.push(`/workspaces/${vm.id}`);
+        router.push(`/workspaces?w=${encodeURIComponent(vm.id)}`);
       },
     });
   }

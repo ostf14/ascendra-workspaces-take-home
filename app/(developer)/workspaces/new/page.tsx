@@ -54,7 +54,8 @@ export default function NewWorkspacePage() {
     create.mutate(
       { templateId, name },
       {
-        onSuccess: (workspace) => router.push(`/workspaces/${workspace.id}`),
+        onSuccess: (workspace) =>
+          router.push(`/workspaces?w=${encodeURIComponent(workspace.id)}`),
       }
     );
   }
