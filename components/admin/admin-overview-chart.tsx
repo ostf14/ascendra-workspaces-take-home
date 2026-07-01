@@ -43,8 +43,8 @@ export function AdminOverviewChart({
 }) {
   if (loading || !series) {
     return (
-      <section className="rounded-lg border border-border-default bg-surface-elevated p-5">
-        <Skeleton className="h-56 w-full" />
+      <section className="flex h-full min-h-[280px] flex-col rounded-md bg-surface-secondary p-5">
+        <Skeleton className="h-full min-h-[220px] w-full" />
       </section>
     );
   }
@@ -54,9 +54,9 @@ export function AdminOverviewChart({
   return (
     <section
       aria-label="Aggregate utilization, last 24h"
-      className="rounded-lg border border-border-default bg-surface-elevated"
+      className="flex h-full min-h-[280px] flex-col rounded-md bg-surface-secondary"
     >
-      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle px-5 py-3.5">
+      <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3">
         <h2 className="text-sm font-medium text-text-primary">
           Aggregate utilization · last 24h
         </h2>
@@ -79,7 +79,7 @@ export function AdminOverviewChart({
           </li>
         </ul>
       </header>
-      <div className="h-64 px-5 py-4">
+      <div className="min-h-64 flex-1 px-5 pb-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <defs>

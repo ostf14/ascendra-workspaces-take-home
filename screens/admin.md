@@ -19,21 +19,14 @@ Sections live under `/admin/*`. Only users with `role: "admin"` see this section
 
 Home page for the admin. First view after sign-in.
 
-**Hero region — waste insight card** (see decision 03):
-- Count of idle workspaces
-- Estimated monthly waste
-- Primary action → inventory filtered to idle
-- Positive empty state when zero idle
+Layout (top to bottom):
 
-**Metrics strip** — 4–6 hero numbers with delta vs prior period:
-- Running VMs (running / total ratio)
-- Active users
-- Hourly cost
-- Month-to-date cost
-- Projected monthly cost
-- Aggregate CPU utilization
+1. **Waste insight card** — full-width, sticks to the top of the content area. Unchanged from decision 03: idle count, estimated monthly waste, primary action into the filtered inventory, positive empty state when zero idle.
+2. **Split row** — two equal columns, 16px gap:
+   - **Left column** — 2×3 grid of `HeroMetric` stat cards (12px gap between cards). Reading order (row-major): Running VMs · Month to date · Active users · Projected month · Hourly cost · Aggregate CPU. Each card is a `--surface-secondary` plate (`--radius-md`, 20px padding) with label at top (`--text-sm`, tertiary), value in the middle (`--text-2xl` / 32px, JetBrains Mono, weight 500), delta strip at the bottom (`--text-xs` — arrow icon + percentage in status color + "vs last week" in tertiary).
+   - **Right column** — `AdminOverviewChart` (CPU + Memory over last 24h) in a matching `--surface-secondary` plate. Header row inside the plate carries the title and the legend dots; the chart body fills the remaining height and matches the left column's height via `align-items: stretch` on the grid.
 
-**Below the fold:** aggregate CPU and memory utilization chart, last 24 hours.
+Below 1200px viewport, the grid wraps to a single column: waste card → 2×3 metric grid → chart, stacked.
 
 ## Screen 2 — VM Inventory (`/admin/workspaces`)
 

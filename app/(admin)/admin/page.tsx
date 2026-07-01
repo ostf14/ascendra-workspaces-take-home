@@ -20,49 +20,50 @@ export default function AdminOverviewPage() {
 
       <WasteInsightCard data={data} loading={isPending} />
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-        <HeroMetric
-          label="Running VMs"
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <div className="grid grid-cols-2 gap-3">
+          <HeroMetric
+            label="Running VMs"
+            loading={isPending}
+            value={data ? `${data.runningCount} / ${data.totalCount}` : "—"}
+            delta={data?.deltas.runningCount}
+          />
+          <HeroMetric
+            label="Month to date"
+            loading={isPending}
+            value={data ? formatCurrency(data.monthToDateCost, { fractionDigits: 0 }) : "—"}
+            delta={data?.deltas.monthToDateCost}
+          />
+          <HeroMetric
+            label="Active users"
+            loading={isPending}
+            value={data ? `${data.activeUsers}` : "—"}
+            delta={data?.deltas.activeUsers}
+          />
+          <HeroMetric
+            label="Projected month"
+            loading={isPending}
+            value={data ? formatCurrency(data.projectedMonthlyCost, { fractionDigits: 0 }) : "—"}
+            delta={data?.deltas.projectedMonthlyCost}
+          />
+          <HeroMetric
+            label="Hourly cost"
+            loading={isPending}
+            value={data ? formatCurrency(data.hourlyCost) : "—"}
+            delta={data?.deltas.hourlyCost}
+          />
+          <HeroMetric
+            label="Aggregate CPU"
+            loading={isPending}
+            value={data ? formatPercent(data.aggregateCpu) : "—"}
+            delta={data?.deltas.aggregateCpu}
+          />
+        </div>
+        <AdminOverviewChart
+          series={data?.aggregateUtilization24h}
           loading={isPending}
-          value={data ? `${data.runningCount} / ${data.totalCount}` : "—"}
-          delta={data?.deltas.runningCount}
-        />
-        <HeroMetric
-          label="Active users"
-          loading={isPending}
-          value={data ? `${data.activeUsers}` : "—"}
-          delta={data?.deltas.activeUsers}
-        />
-        <HeroMetric
-          label="Hourly cost"
-          loading={isPending}
-          value={data ? formatCurrency(data.hourlyCost) : "—"}
-          delta={data?.deltas.hourlyCost}
-        />
-        <HeroMetric
-          label="Month to date"
-          loading={isPending}
-          value={data ? formatCurrency(data.monthToDateCost, { fractionDigits: 0 }) : "—"}
-          delta={data?.deltas.monthToDateCost}
-        />
-        <HeroMetric
-          label="Projected month"
-          loading={isPending}
-          value={data ? formatCurrency(data.projectedMonthlyCost, { fractionDigits: 0 }) : "—"}
-          delta={data?.deltas.projectedMonthlyCost}
-        />
-        <HeroMetric
-          label="Aggregate CPU"
-          loading={isPending}
-          value={data ? formatPercent(data.aggregateCpu) : "—"}
-          delta={data?.deltas.aggregateCpu}
         />
       </div>
-
-      <AdminOverviewChart
-        series={data?.aggregateUtilization24h}
-        loading={isPending}
-      />
     </section>
   );
 }

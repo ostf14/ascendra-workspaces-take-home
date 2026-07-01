@@ -23,7 +23,7 @@ export function HeroMetric({
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-lg border border-border-default bg-surface-elevated p-5",
+        "flex flex-col gap-2 rounded-md bg-surface-secondary p-5",
         className
       )}
     >
