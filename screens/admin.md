@@ -63,11 +63,11 @@ The admin's workhorse. Master-detail layout — table on the left (2/3), workspa
 Top to bottom:
 - Header: mono workspace name + status pill + idle text modifier if applicable
 - Sub-header: `templateName · region · Provisioned MMM d, yyyy` (`--text-sm`, tertiary)
-- Admin actions row: Force-stop · Recreate · Reassign owner · Delete (Delete uses destructive styling; Force-stop is disabled when stopped or stopping)
-- Owner card: user icon in a circle + name + email + Email link
+- Admin actions row: single horizontal line — three secondary labeled buttons (Force-stop · Recreate · Reassign owner) grouped left, with Delete pushed to the far right via `margin-left: auto` as an icon-only ghost button (Lucide `Trash2`, `--status-error`) with a "Delete workspace" tooltip. Force-stop is disabled when the workspace is already stopped or stopping. This replaced an earlier layout where Delete lived on its own second row with a red-outlined labeled button — the two-row action stack broke the panel's vertical rhythm without earning its extra space.
+- Owner row: compact single row (not a card). 32px circular avatar on `--surface-secondary`, then name (weight 500) + email (mono, `--text-sm`, `--text-secondary`) laid out inline, then a `Mail` icon-only ghost button on the right that opens `mailto:`. Subtle border-bottom separator instead of a full card plate. The earlier design had a `Card` with an orphaned "Email" text label whose corresponding value slot rendered empty when the user record loaded — the row form drops the placeholder entirely and turns the affordance into a real link.
 - Live usage plate: three 56px `UsageCircle`s (CPU / Memory / Disk) on a `--surface-secondary` plate
 - Cost plate: Session cost + Hourly cost, both `--text-base` mono, weight 500
-- Recent activity: last 5 lifecycle events with relative timestamps. Derived from the workspace's `createdAt` / `lastActiveAt` / current status — no activity-log endpoint exists in the mock store yet, so the list is synthesized deterministically from the VM record.
+- Recent activity: last 5 lifecycle events with `formatCompactRelative` timestamps (mono, tabular-nums). Derived from the workspace's `createdAt` / `lastActiveAt` / current status — no activity-log endpoint exists in the mock store yet, so the list is synthesized deterministically from the VM record.
 
 **Panel empty state:** when no workspace is selected, the panel shows a centered "Select a workspace / Pick a row from the table to see details and take action." with a `MousePointerClick` icon in `--text-tertiary`.
 

@@ -2,6 +2,7 @@
 
 import { format, parseISO } from "date-fns";
 import {
+  Mail,
   MousePointerClick,
   OctagonX,
   RotateCcw,
@@ -20,6 +21,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { DeleteWorkspaceDialog } from "@/components/workspace/delete-workspace-dialog";
 import { IdleIndicator } from "@/components/workspace/idle-pill";
 import { RecreateWorkspaceDialog } from "@/components/workspace/recreate-workspace-dialog";
@@ -122,7 +128,7 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
         </p>
       </header>
 
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-3">
         <Button
           size="sm"
           variant="outline"
@@ -148,18 +154,23 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
           <UserCog className="size-4" strokeWidth={1.5} />
           Reassign owner
         </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setDeleteOpen(true)}
-          className="ml-auto border-status-error/40 text-status-error hover:bg-status-error/10 hover:text-status-error"
-        >
-          <Trash2 className="size-4" strokeWidth={1.5} />
-          Delete
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              aria-label="Delete workspace"
+              onClick={() => setDeleteOpen(true)}
+              className="ml-auto text-status-error hover:bg-status-error/10 hover:text-status-error"
+            >
+              <Trash2 className="size-4" strokeWidth={1.5} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Delete workspace</TooltipContent>
+        </Tooltip>
       </div>
 
-      <OwnerCard ownerId={workspace.ownerId} />
+      <OwnerRow ownerId={workspace.ownerId} />
 
       <div className="flex items-center justify-around gap-6 rounded-md bg-surface-secondary px-5 py-4">
         <UsageCircle label="CPU" value={workspace.cpu} size="md" />
@@ -195,30 +206,39 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
   );
 }
 
-function OwnerCard({ ownerId }: { ownerId: string }) {
+function OwnerRow({ ownerId }: { ownerId: string }) {
   const { data: users } = useUsers();
   const owner = users?.find((u) => u.id === ownerId);
 
   return (
-    <div className="flex items-center gap-3 rounded-md bg-surface-secondary px-4 py-3">
-      <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-surface-page text-text-secondary">
+    <div className="flex items-center gap-3 border-b border-border-subtle pb-3">
+      <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-secondary text-text-secondary">
         <User className="size-4" strokeWidth={1.5} />
       </span>
-      <div className="min-w-0 flex-1 flex-col">
-        <p className="truncate text-sm font-medium text-text-primary">
+      <div className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <span className="truncate text-sm font-medium text-text-primary">
           {owner?.name ?? "Unknown owner"}
-        </p>
-        <p className="truncate font-mono text-xs text-text-tertiary">
+        </span>
+        <span className="truncate font-mono text-sm text-text-secondary">
           {owner?.email ?? "—"}
-        </p>
+        </span>
       </div>
       {owner ? (
-        <a
-          href={`mailto:${owner.email}`}
-          className="text-xs text-text-tertiary transition-colors hover:text-text-primary"
-        >
-          Email
-        </a>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              asChild
+              size="icon-sm"
+              variant="ghost"
+              className="text-text-tertiary hover:text-text-primary"
+            >
+              <a href={`mailto:${owner.email}`} aria-label={`Email ${owner.name}`}>
+                <Mail className="size-4" strokeWidth={1.5} />
+              </a>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Email owner</TooltipContent>
+        </Tooltip>
       ) : null}
     </div>
   );
