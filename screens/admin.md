@@ -22,11 +22,25 @@ Home page for the admin. First view after sign-in.
 Layout (top to bottom):
 
 1. **Waste insight card** — full-width, sticks to the top of the content area. Unchanged from decision 03: idle count, estimated monthly waste, primary action into the filtered inventory, positive empty state when zero idle.
-2. **Split row** — two equal columns, 16px gap:
-   - **Left column** — 2×3 grid of `HeroMetric` stat cards (12px gap between cards). Reading order (row-major): Running VMs · Month to date · Active users · Projected month · Hourly cost · Aggregate CPU. Each card is a `--surface-secondary` plate (`--radius-md`, 20px padding) with label at top (`--text-sm`, tertiary), value in the middle (`--text-2xl` / 32px, JetBrains Mono, weight 500), delta strip at the bottom (`--text-xs` — arrow icon + percentage in status color + "vs last week" in tertiary).
-   - **Right column** — `AdminOverviewChart` (CPU + Memory over last 24h) in a matching `--surface-secondary` plate. Header row inside the plate carries the title and the legend dots; the chart body fills the remaining height and matches the left column's height via `align-items: stretch` on the grid.
+2. **Split row** — two equal columns, 16px gap. Left column: two grouped metric cards stacked vertically (16px gap between them). Right column: aggregate utilization chart, `align-self: stretch` so it fills the left column's combined height.
 
-Below 1200px viewport, the grid wraps to a single column: waste card → 2×3 metric grid → chart, stacked.
+The six loose `HeroMetric` cards from the earlier iteration were regrouped into two semantic cards, because the six numbers belong to three different stories and grouping surfaces that. `HeroMetric` retired; `MetricGroupCard` replaces it.
+
+**Cost this month** card (3 columns, thin vertical divider between each):
+- Hourly · Month to date · Projected — each with `--text-xs` tertiary label, `--text-2xl` (32px) JetBrains Mono weight 500 value, and the shared delta strip below.
+
+**Fleet health** card (2 columns, thin vertical divider between each):
+- Running VMs (as `running / total`) · Active users — same visual treatment as Cost.
+
+**Aggregate utilization** card (right column):
+- Header row: title + legend dots (CPU · Memory).
+- Recharts area chart, Y-axis 0–100 with 25% ticks, X-axis time-of-day labels. `align-self: stretch` on the grid so the chart card fills the left column's combined height.
+
+The **Aggregate CPU** hero number was retired. The chart already carries the same information more richly (over time, alongside memory); duplicating it as a standalone percentage next to the chart was redundant. Anyone who wants the current value reads the rightmost point of the chart.
+
+All three cards share `--surface-secondary` background, `--radius-md`, and 24px padding — same treatment the developer workspace panel uses for its stats plates, so the two surfaces read as one design language.
+
+Below 1200px viewport, the outer grid collapses to a single column: waste card → Cost card → Fleet health card → Chart card, all stacked.
 
 ## Screen 2 — VM Inventory (`/admin/workspaces`)
 
@@ -106,7 +120,7 @@ This closes scenario 6 (onboarding). It's also the only path by which an `engine
 
 ## Component inventory (admin-specific)
 
-- **HeroMetric** — large number + label + delta vs prior period with trend arrow
+- **MetricGroupCard** — surface-secondary plate that hosts a row of related metrics (Cost this month, Fleet health) with a small section header, per-column labels + `--text-2xl` mono values + delta strip, thin vertical dividers between columns. Replaces the earlier single-metric `HeroMetric` primitive.
 - **WasteInsightCard** — full-width anomaly-style card with action; positive empty state when no waste
 - **AdminVMTable** — dense table, sortable columns, row selection
 - **BulkActionBar** — appears on selection, sticky to top of table

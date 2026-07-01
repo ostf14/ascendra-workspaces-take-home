@@ -112,6 +112,7 @@ export function AdminOverviewChart({
             />
             <YAxis
               domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
               width={32}
               axisLine={false}
               tickLine={false}

@@ -1,10 +1,10 @@
 "use client";
 
 import { AdminOverviewChart } from "@/components/admin/admin-overview-chart";
-import { HeroMetric } from "@/components/admin/hero-metric";
+import { MetricGroupCard } from "@/components/admin/metric-group-card";
 import { WasteInsightCard } from "@/components/admin/waste-insight-card";
 import { useAdminOverview } from "@/lib/hooks/use-fleet";
-import { formatCurrency, formatPercent } from "@/lib/utils/format";
+import { formatCurrency } from "@/lib/utils/format";
 
 export default function AdminOverviewPage() {
   const { data, isPending } = useAdminOverview();
@@ -20,43 +20,48 @@ export default function AdminOverviewPage() {
 
       <WasteInsightCard data={data} loading={isPending} />
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <div className="grid grid-cols-2 gap-3">
-          <HeroMetric
-            label="Running VMs"
+      <div className="grid grid-cols-1 items-stretch gap-4 xl:grid-cols-2">
+        <div className="flex flex-col gap-4">
+          <MetricGroupCard
+            title="Cost this month"
             loading={isPending}
-            value={data ? `${data.runningCount} / ${data.totalCount}` : "—"}
-            delta={data?.deltas.runningCount}
+            items={[
+              {
+                label: "Hourly",
+                value: data ? formatCurrency(data.hourlyCost) : "—",
+                delta: data?.deltas.hourlyCost,
+              },
+              {
+                label: "Month to date",
+                value: data
+                  ? formatCurrency(data.monthToDateCost, { fractionDigits: 0 })
+                  : "—",
+                delta: data?.deltas.monthToDateCost,
+              },
+              {
+                label: "Projected",
+                value: data
+                  ? formatCurrency(data.projectedMonthlyCost, { fractionDigits: 0 })
+                  : "—",
+                delta: data?.deltas.projectedMonthlyCost,
+              },
+            ]}
           />
-          <HeroMetric
-            label="Month to date"
+          <MetricGroupCard
+            title="Fleet health"
             loading={isPending}
-            value={data ? formatCurrency(data.monthToDateCost, { fractionDigits: 0 }) : "—"}
-            delta={data?.deltas.monthToDateCost}
-          />
-          <HeroMetric
-            label="Active users"
-            loading={isPending}
-            value={data ? `${data.activeUsers}` : "—"}
-            delta={data?.deltas.activeUsers}
-          />
-          <HeroMetric
-            label="Projected month"
-            loading={isPending}
-            value={data ? formatCurrency(data.projectedMonthlyCost, { fractionDigits: 0 }) : "—"}
-            delta={data?.deltas.projectedMonthlyCost}
-          />
-          <HeroMetric
-            label="Hourly cost"
-            loading={isPending}
-            value={data ? formatCurrency(data.hourlyCost) : "—"}
-            delta={data?.deltas.hourlyCost}
-          />
-          <HeroMetric
-            label="Aggregate CPU"
-            loading={isPending}
-            value={data ? formatPercent(data.aggregateCpu) : "—"}
-            delta={data?.deltas.aggregateCpu}
+            items={[
+              {
+                label: "Running VMs",
+                value: data ? `${data.runningCount} / ${data.totalCount}` : "—",
+                delta: data?.deltas.runningCount,
+              },
+              {
+                label: "Active users",
+                value: data ? `${data.activeUsers}` : "—",
+                delta: data?.deltas.activeUsers,
+              },
+            ]}
           />
         </div>
         <AdminOverviewChart
