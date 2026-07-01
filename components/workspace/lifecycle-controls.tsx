@@ -80,8 +80,31 @@ export function LifecycleControls({
 
   return (
     <div className="flex items-center gap-2">
-      {/* Primary slot */}
-      {status === "running" && onOpen ? onOpen() : null}
+      {status === "running" ? (
+        <>
+          <HintButton
+            tooltip={HINTS.restart}
+            onClick={onRestart}
+            disabled={restart.isPending}
+            size={buttonSize}
+            variant="ghost"
+          >
+            <RotateCcw className="size-4" strokeWidth={1.5} />
+            Restart
+          </HintButton>
+          <HintButton
+            tooltip={HINTS.stop}
+            onClick={onStop}
+            disabled={stop.isPending}
+            size={buttonSize}
+            variant="ghost"
+          >
+            <CircleStop className="size-4" strokeWidth={1.5} />
+            Stop
+          </HintButton>
+          {onOpen ? onOpen() : null}
+        </>
+      ) : null}
 
       {status === "stopped" ? (
         <HintButton
@@ -111,37 +134,22 @@ export function LifecycleControls({
       ) : null}
 
       {status === "error" ? (
-        <HintButton
-          tooltip={HINTS.restart}
-          onClick={onRestart}
-          disabled={restart.isPending}
-          size={buttonSize}
-          variant="default"
-        >
-          <RotateCcw className="size-4" strokeWidth={1.5} />
-          Restart
-        </HintButton>
-      ) : null}
-
-      {/* Secondaries — hidden during transitions */}
-      {!isTransitional && status === "running" ? (
         <>
           <HintButton
-            tooltip={HINTS.stop}
-            onClick={onStop}
-            disabled={stop.isPending}
+            tooltip={HINTS.recreate}
+            onClick={() => setRecreateOpen(true)}
             size={buttonSize}
             variant="ghost"
           >
-            <CircleStop className="size-4" strokeWidth={1.5} />
-            Stop
+            <RotateCcw className="size-4" strokeWidth={1.5} />
+            Recreate
           </HintButton>
           <HintButton
             tooltip={HINTS.restart}
             onClick={onRestart}
             disabled={restart.isPending}
             size={buttonSize}
-            variant="ghost"
+            variant="default"
           >
             <RotateCcw className="size-4" strokeWidth={1.5} />
             Restart
@@ -149,19 +157,7 @@ export function LifecycleControls({
         </>
       ) : null}
 
-      {!isTransitional && status === "error" ? (
-        <HintButton
-          tooltip={HINTS.recreate}
-          onClick={() => setRecreateOpen(true)}
-          size={buttonSize}
-          variant="ghost"
-        >
-          <RotateCcw className="size-4" strokeWidth={1.5} />
-          Recreate
-        </HintButton>
-      ) : null}
-
-      {/* Kebab — hidden during transitions */}
+      {/* Kebab — always right-adjacent to the primary; hidden during transitions */}
       {!isTransitional ? (
         <WorkspaceActionsDropdown
           workspace={workspace}

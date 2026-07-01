@@ -67,16 +67,20 @@ When no workspace is selected — the list is empty of a fallback for `?w=` — 
 
 ### State machine (applied to the panel actions row)
 
-| Status | Primary | Sec 1 | Sec 2 | Kebab |
-|---|---|---|---|---|
-| running | Open (opens Connect popover) | Stop | Restart | Rename / Duplicate / Copy ID / Delete |
-| stopped | Start | — | — | Rename / Duplicate / Copy ID / Delete |
-| starting | Starting · ~12s (disabled, live countdown) | — | — | — |
-| stopping | Stopping · ~12s (disabled, live countdown) | — | — | — |
-| error | Restart | Recreate | — | Rename / Duplicate / Copy ID / Delete |
+Layout convention: destructive / reversible actions on the left, primary CTA on the right adjacent to the kebab. Matches AWS Console / GCP / Stripe Dashboard convention for operational tooling — the eye lands at the end of the row on the primary action.
+
+| Status | Layout (left → right) |
+|---|---|
+| running | Restart · Stop · Open (opens Connect popover) · ⋯ |
+| stopped | Start · ⋯ |
+| starting | Starting · ~12s (disabled, live countdown, single button) |
+| stopping | Stopping · ~12s (disabled, live countdown, single button) |
+| error | Recreate · Restart · ⋯ |
+
+Kebab contents in every non-transitional state: Rename · Duplicate · Copy ID · Delete.
 
 Rules:
-- Exactly one primary button visible at a time.
+- Exactly one primary button visible at a time; it is always right-adjacent to the kebab.
 - Secondary actions are HIDDEN (not disabled) during transitions to avoid a wall of dimmed controls.
 - The kebab is hidden during transitions; it comes back once the state settles.
 - Open behaviour: the button opens a Popover anchored below it with the three connect methods (VS Code desktop / Open in browser / Copy SSH). The popover closes on selection or click outside. There is no route change on Open.
