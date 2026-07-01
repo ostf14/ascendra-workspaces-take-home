@@ -87,10 +87,13 @@ ReMargin's warm-cream light scope (`#fdfcf5` page, `#f5efdf` secondary, brown te
 - Grid lines: `--border-subtle` (rgba alpha 0.07)
 - No standalone legends if avoidable; inline label in chart title or tooltip
 
-**Hero metric typography** (admin overview metric values like `$4,820`, `42 idle`):
-- Value: `--text-2xl` (32px), JetBrains Mono, weight 500 — the earlier 48px (`--text-3xl`) read as marketing scale rather than dashboard scale, so the metric card values were dropped one step in the type scale. The `--text-3xl` token stays in globals.css for future use (splash surfaces, empty-state hero copy) but no admin surface currently paints at that size.
-- Label above metric: `--text-sm` (13px), weight 500, `--text-tertiary`
-- Delta strip below metric: `--text-xs` (11px), tertiary text for "vs last week", inline arrow + status color for the direction.
+**Grouped metric typography** (admin overview metric cards):
+- Value: `--text-2xl` (32px), JetBrains Mono, weight 500 — the earlier 48px (`--text-3xl`) read as marketing scale rather than dashboard scale, so the metric values were dropped one step in the type scale. The `--text-3xl` token stays in globals.css for future use (splash surfaces, empty-state hero copy) but no admin surface currently paints at that size.
+- Column label above value: `--text-xs` (11px), `--text-tertiary`, weight 400.
+- Section header on the group card: `--text-xs`, uppercase, letter-spacing 0.06em, tertiary — a quiet label that names the story ("Cost this month", "Fleet health") without competing with the values.
+- Delta strip below value: `--text-xs`, tertiary text for "vs last week", inline arrow + status color for the direction.
+
+**Retired: standalone Aggregate CPU number.** The overview used to render an isolated Aggregate CPU percentage card next to the utilization chart. The chart already carries the same information more richly — current value at the rightmost point, plus history and memory alongside — so the standalone number was redundant. Removing it also freed up a slot in the metric grid that would otherwise have wanted padding to preserve the 2×3 rhythm. Anyone who needs the current aggregate reads the chart.
 
 **Table density spec** (admin inventory):
 - Row height: 36px default, 32px compact toggle
