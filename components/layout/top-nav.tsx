@@ -49,6 +49,7 @@ export function TopNav() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={isActive ? "page" : undefined}
                   className={cn(
                     "rounded-md px-3 py-1.5 text-sm transition-colors",
                     isActive

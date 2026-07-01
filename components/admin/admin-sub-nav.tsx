@@ -44,6 +44,7 @@ export function AdminSubNav() {
             <li key={link.href}>
               <Link
                 href={link.href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "inline-block border-b-2 px-3 py-3 text-sm transition-colors",
                   isActive
