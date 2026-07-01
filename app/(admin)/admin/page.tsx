@@ -12,7 +12,7 @@ export default function AdminOverviewPage() {
   return (
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-6 py-8">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-medium text-text-primary">Overview</h1>
+        <h1 className="text-lg font-medium leading-tight text-text-primary">Overview</h1>
         <p className="text-sm text-text-secondary">
           Fleet-wide health, cost, and anything that&apos;s wasting spend.
         </p>

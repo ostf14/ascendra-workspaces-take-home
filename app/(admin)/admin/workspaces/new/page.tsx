@@ -80,7 +80,7 @@ export default function AdminProvisionWorkspacePage() {
       </Link>
 
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-medium text-text-primary">
+        <h1 className="text-lg font-medium leading-tight text-text-primary">
           Provision workspace
         </h1>
         <p className="text-sm text-text-secondary">

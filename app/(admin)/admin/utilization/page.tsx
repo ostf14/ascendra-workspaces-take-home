@@ -25,7 +25,7 @@ export default function AdminUtilizationPage() {
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-6 py-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-medium text-text-primary">Utilization</h1>
+          <h1 className="text-lg font-medium leading-tight text-text-primary">Utilization</h1>
           <p className="text-sm text-text-secondary">
             Where the fleet sits, and how the load shifts across the day.
           </p>

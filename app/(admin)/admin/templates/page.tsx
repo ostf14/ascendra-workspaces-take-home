@@ -15,7 +15,7 @@ export default function AdminTemplatesPage() {
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-6 py-8">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-medium text-text-primary">Templates</h1>
+          <h1 className="text-lg font-medium leading-tight text-text-primary">Templates</h1>
           <p className="text-sm text-text-secondary">
             Base images and specs developers can provision from.
           </p>

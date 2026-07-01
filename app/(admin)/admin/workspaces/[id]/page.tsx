@@ -44,7 +44,7 @@ export default function AdminWorkspaceDetailPage({
               <p className="text-xs uppercase tracking-[0.16em] text-text-tertiary">
                 Admin view
               </p>
-              <h1 className="font-mono text-2xl font-medium text-text-primary">{data.name}</h1>
+              <h1 className="font-mono text-lg font-medium leading-tight text-text-primary">{data.name}</h1>
               <div className="flex items-center gap-3">
                 <StatusBadge status={data.status} />
                 {data.isIdle ? (
