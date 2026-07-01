@@ -87,12 +87,28 @@ Analytical view. Where the admin goes to understand patterns, not to act.
 
 ## Screen 4 — Templates (`/admin/templates`)
 
-List or grid of all templates.
+Master-detail layout — compact template cards on the left (2/3), template detail panel on the right (1/3). Same shape as `/admin/workspaces` so the two admin surfaces read as one design language. The grid card layout the earlier iteration used was optimized for a marketing scan of the fleet; in practice the admin needs to pick one template and see everything about it — specs, tools, usage, and the workspaces currently on it — which is what master-detail delivers.
 
-**Per template card:**
-- Name, base image, specs, preinstalled tools
-- Usage stats: currently running workspaces, monthly cost contribution
-- Edit action
+**List card (left, one row per template):**
+- Name (weight 500) + hourly cost right-aligned
+- Base image (mono, tertiary)
+- vCPU / Memory / Disk chips + "N in use" on the right
+- No inline Edit — that action moved into the detail panel
+
+**Panel (right 1/3, min-width 380px):**
+Top to bottom:
+- Header: template name + `Edit` outline button on the right (links to `/admin/templates/[id]`)
+- Base image (mono, tertiary) and description
+- Specs plate: vCPU · Memory · Disk (three columns, `--surface-secondary`, `--radius-md`)
+- Preinstalled tools chip row (only when non-empty)
+- Usage plate: `In use` count + `Est. monthly` cost contribution — same visual treatment as the workspaces panel's cost plate for design coherence
+- Recent workspaces: last 5 workspaces provisioned from this template, sorted by `lastActiveAt` desc. Each row shows mono workspace name, owner email, status pill, compact last-active time; clicking a row deep-links to `/admin/workspaces?w=<vm-id>` so the admin can jump straight into the fleet detail panel. Empty state when no workspaces reference the template.
+
+Selection state uses the state-as-truth + `history.replaceState` mirror pattern — see the workspaces surface. URL parameter is `?t=<template-id>`.
+
+Panel sticks to `top: 112px` with `max-height: calc(100vh - 136px)` and internal `overflow-y: auto` so a long recent-workspace list scrolls internally rather than pushing the layout.
+
+Below ~1200px viewport the grid collapses to a single column: list on top, panel below.
 
 **"New template"** button → create form (`/admin/templates/new`).
 
