@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal } from "lucide-react";
@@ -20,7 +19,7 @@ import type {
   FleetSortKey,
   SortOrder,
 } from "@/lib/domain/types";
-import { formatCurrency, formatPercent } from "@/lib/utils/format";
+import { formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 type Column = {
@@ -38,7 +37,6 @@ const COLUMNS: Column[] = [
   { key: "memory", label: "RAM", align: "right" },
   { key: "disk", label: "Disk", align: "right" },
   { key: "lastActiveAt", label: "Last active", align: "right" },
-  { key: "hourlyCost", label: "Hourly cost", align: "right" },
 ];
 
 function compareValues(
@@ -81,6 +79,8 @@ export function AdminVMTable({
   order,
   onSortChange,
   onAction,
+  activeId,
+  onSelectRow,
 }: {
   rows: FleetInventoryItem[];
   selected: Set<string>;
@@ -90,6 +90,8 @@ export function AdminVMTable({
   order: SortOrder;
   onSortChange: (key: FleetSortKey) => void;
   onAction: (action: "start" | "stop" | "restart" | "delete", id: string) => void;
+  activeId?: string;
+  onSelectRow?: (id: string) => void;
 }) {
   const allSelected = rows.length > 0 && rows.every((r) => selected.has(r.id));
   const someSelected = rows.some((r) => selected.has(r.id)) && !allSelected;
@@ -103,18 +105,17 @@ export function AdminVMTable({
   return (
     <div className="rounded-lg border border-border-default bg-surface-elevated">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[960px] table-fixed border-collapse text-sm">
+        <table className="w-full min-w-[840px] table-fixed border-collapse text-sm">
           <colgroup>
             <col className="w-[36px]" />
+            <col className="w-[20%]" />
             <col className="w-[18%]" />
-            <col className="w-[16%]" />
-            <col className="w-[12%]" />
-            <col className="w-[7%]" />
-            <col className="w-[6%]" />
-            <col className="w-[6%]" />
-            <col className="w-[6%]" />
-            <col className="w-[10%]" />
+            <col className="w-[13%]" />
             <col className="w-[8%]" />
+            <col className="w-[7%]" />
+            <col className="w-[7%]" />
+            <col className="w-[7%]" />
+            <col className="w-[13%]" />
             <col className="w-[44px]" />
           </colgroup>
           <thead>
@@ -157,18 +158,30 @@ export function AdminVMTable({
           <tbody>
             {sorted.map((row) => {
               const checked = selected.has(row.id);
-              const detailHref = `/admin/workspaces/${row.id}`;
+              const active = activeId === row.id;
               return (
                 <tr
                   key={row.id}
                   data-selected={checked || undefined}
+                  data-active={active || undefined}
+                  onClick={() => onSelectRow?.(row.id)}
                   className={cn(
-                    "h-9 border-b border-border-subtle text-[13px] leading-none text-text-primary transition-colors",
+                    "h-9 cursor-pointer border-b border-border-subtle text-[13px] leading-none text-text-primary transition-colors",
                     "hover:bg-surface-secondary",
-                    checked && "bg-accent-coral/5"
+                    checked && !active && "bg-accent-coral/5",
+                    active &&
+                      "bg-[color:color-mix(in_oklab,var(--accent)_5%,transparent)]"
                   )}
+                  style={
+                    active
+                      ? { boxShadow: "inset 2px 0 0 var(--accent)" }
+                      : undefined
+                  }
                 >
-                  <td className="px-3 py-2 whitespace-nowrap">
+                  <td
+                    className="px-3 py-2 whitespace-nowrap"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <Checkbox
                       checked={checked}
                       onCheckedChange={(next) => onToggleRow(row.id, Boolean(next))}
@@ -176,12 +189,7 @@ export function AdminVMTable({
                     />
                   </td>
                   <td className="px-3 py-2 font-mono">
-                    <Link
-                      href={detailHref}
-                      className="block truncate hover:text-accent-coral"
-                    >
-                      {row.name}
-                    </Link>
+                    <span className="block truncate">{row.name}</span>
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap">
                     <div className="flex items-baseline gap-1.5 leading-none">
@@ -209,10 +217,10 @@ export function AdminVMTable({
                       addSuffix: true,
                     })}
                   </td>
-                  <td className="px-3 py-2 text-right font-mono tabular-nums">
-                    {formatCurrency(row.hourlyCost)}
-                  </td>
-                  <td className="px-3 py-2 text-right">
+                  <td
+                    className="px-3 py-2 text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button

@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AdminVMTable } from "@/components/admin/admin-vm-table";
+import { AdminWorkspacePanel } from "@/components/admin/admin-workspace-panel";
 import { BulkActionBar } from "@/components/admin/bulk-action-bar";
 import { FleetFilters, type FleetFiltersValue } from "@/components/admin/fleet-filters";
 import { DeleteWorkspaceDialog } from "@/components/workspace/delete-workspace-dialog";
@@ -23,7 +24,6 @@ import type {
   FleetInventoryItem,
   FleetSortKey,
   SortOrder,
-  VMStatus,
 } from "@/lib/domain/types";
 import { vmStatusSchema } from "@/lib/domain/schemas";
 
@@ -66,10 +66,11 @@ function isFleetSortKey(value: string): value is FleetSortKey {
   ].includes(value);
 }
 
-function writeFiltersToUrl(
+function serializeQuery(
   filters: FleetFiltersValue,
   sort: FleetSortKey,
-  order: SortOrder
+  order: SortOrder,
+  selectedId?: string
 ): string {
   const next = new URLSearchParams();
   if (filters.search) next.set("search", filters.search);
@@ -79,8 +80,13 @@ function writeFiltersToUrl(
   if (filters.idleOnly) next.set("idleOnly", "true");
   if (sort !== DEFAULT_SORT) next.set("sort", sort);
   if (order !== DEFAULT_ORDER) next.set("order", order);
-  const qs = next.toString();
-  return qs ? `?${qs}` : "";
+  if (selectedId) next.set("w", selectedId);
+  return next.toString();
+}
+
+function readSelectedFromLocation(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return new URLSearchParams(window.location.search).get("w") ?? undefined;
 }
 
 export default function AdminWorkspacesPage() {
@@ -108,21 +114,46 @@ export default function AdminWorkspacesPage() {
   const stop = useStopWorkspace();
   const restart = useRestartWorkspace();
 
-  const rows = inventoryQuery.data ?? [];
-
-  const updateUrl = useCallback(
-    (nextFilters: FleetFiltersValue, nextSort: FleetSortKey, nextOrder: SortOrder) => {
-      const search = writeFiltersToUrl(nextFilters, nextSort, nextOrder);
-      router.replace(`/admin/workspaces${search}`);
-      setSelected(new Set());
-    },
-    [router]
+  // Panel selection lives in React state. URL is a mirror written via the
+  // History API so rapid table-row clicks don't fight the Next.js router
+  // (see the developer surface selection fix — same pattern applies here).
+  const [activeId, setActiveId] = useState<string | undefined>(
+    () => params.get("w") ?? undefined
   );
 
-  const onChangeFilters = (next: FleetFiltersValue) => updateUrl(next, sort, order);
+  const rows = inventoryQuery.data ?? [];
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const nextQs = serializeQuery(filters, sort, order, activeId);
+    const target = nextQs ? `/admin/workspaces?${nextQs}` : "/admin/workspaces";
+    if (window.location.pathname + window.location.search === target) return;
+    window.history.replaceState({}, "", target);
+  }, [activeId, filters, sort, order]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPopState = () => setActiveId(readSelectedFromLocation());
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  // Filter changes still go through the router so a filter change also
+  // registers a new history entry (bookmarkable state), not just a
+  // replaceState. Selection is finer-grained and stays out of history.
+  const updateFilters = useCallback(
+    (nextFilters: FleetFiltersValue, nextSort: FleetSortKey, nextOrder: SortOrder) => {
+      const qs = serializeQuery(nextFilters, nextSort, nextOrder, activeId);
+      router.replace(`/admin/workspaces${qs ? `?${qs}` : ""}`);
+      setSelected(new Set());
+    },
+    [router, activeId]
+  );
+
+  const onChangeFilters = (next: FleetFiltersValue) => updateFilters(next, sort, order);
 
   const onResetFilters = () =>
-    updateUrl(
+    updateFilters(
       { search: "", status: "", templateId: "", ownerId: "", idleOnly: false },
       DEFAULT_SORT,
       DEFAULT_ORDER
@@ -131,7 +162,7 @@ export default function AdminWorkspacesPage() {
   const onSortChange = (key: FleetSortKey) => {
     const nextOrder: SortOrder =
       sort === key ? (order === "asc" ? "desc" : "asc") : "desc";
-    updateUrl(filters, key, nextOrder);
+    updateFilters(filters, key, nextOrder);
   };
 
   const onToggleRow = (id: string, next: boolean) => {
@@ -160,6 +191,8 @@ export default function AdminWorkspacesPage() {
     if (action === "stop") stop.mutate(id);
     if (action === "restart") restart.mutate(id);
   };
+
+  const onSelectRow = useCallback((id: string) => setActiveId(id), []);
 
   return (
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-5 px-6 py-8">
@@ -196,21 +229,26 @@ export default function AdminWorkspacesPage() {
       ) : rows.length === 0 ? (
         <EmptyState onReset={onResetFilters} />
       ) : (
-        <>
+        <div className="flex flex-col gap-3">
           <p className="text-xs text-text-tertiary">
             {rows.length} workspace{rows.length === 1 ? "" : "s"}
           </p>
-          <AdminVMTable
-            rows={rows}
-            selected={selected}
-            onToggleRow={onToggleRow}
-            onToggleAll={onToggleAll}
-            sort={sort}
-            order={order}
-            onSortChange={onSortChange}
-            onAction={onRowAction}
-          />
-        </>
+          <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(380px,1fr)]">
+            <AdminVMTable
+              rows={rows}
+              selected={selected}
+              onToggleRow={onToggleRow}
+              onToggleAll={onToggleAll}
+              sort={sort}
+              order={order}
+              onSortChange={onSortChange}
+              onAction={onRowAction}
+              activeId={activeId}
+              onSelectRow={onSelectRow}
+            />
+            <AdminWorkspacePanel workspaceId={activeId} />
+          </div>
+        </div>
       )}
 
       {deleteTarget ? (

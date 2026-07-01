@@ -30,26 +30,34 @@ Below 1200px viewport, the grid wraps to a single column: waste card → 2×3 me
 
 ## Screen 2 — VM Inventory (`/admin/workspaces`)
 
-The admin's workhorse. Where most operational time is spent.
+The admin's workhorse. Master-detail layout — table on the left (2/3), workspace panel on the right (1/3). No standalone route for a single VM; the standalone `/admin/workspaces/[id]` redirects into this page with `?w=<vm-id>` selected.
 
 **Page chrome:**
 - Search by name, owner email, template
 - Filters: status, template, owner, idle-only toggle
 - Bulk-action bar — appears on row selection, sticky to top (Stop / Restart / Delete)
 
-**Table columns:**
-- Name (link to detail)
-- Owner (name + email)
-- Template
-- Status
-- CPU% / RAM% / Disk%
-- Last active
-- Hourly cost
-- Kebab menu (per-row actions)
+**Table (left 2/3):**
+- Columns: checkbox · Name · Owner (name + email inline) · Template · Status · CPU · RAM · Disk · Last active · kebab
+- Hourly cost is NOT a column — it moved into the right panel where it sits next to the derived Session cost.
+- Sortable on every column. Default sort: status, then hourly cost descending.
+- Row-click selects the workspace and updates the URL to `?w=<vm-id>` — no route change. Selected row: subtle `--accent-muted` background + 2px left inset accent border. Checkbox and kebab cells stop propagation so those still open menus / toggle selection rather than swapping the panel.
 
-Sortable on every column. Default sort: status, then hourly cost descending.
+**Panel (right 1/3, min-width 380px):**
+Top to bottom:
+- Header: mono workspace name + status pill + idle text modifier if applicable
+- Sub-header: `templateName · region · Provisioned MMM d, yyyy` (`--text-sm`, tertiary)
+- Admin actions row: Force-stop · Recreate · Reassign owner · Delete (Delete uses destructive styling; Force-stop is disabled when stopped or stopping)
+- Owner card: user icon in a circle + name + email + Email link
+- Live usage plate: three 56px `UsageCircle`s (CPU / Memory / Disk) on a `--surface-secondary` plate
+- Cost plate: Session cost + Hourly cost, both `--text-base` mono, weight 500
+- Recent activity: last 5 lifecycle events with relative timestamps. Derived from the workspace's `createdAt` / `lastActiveAt` / current status — no activity-log endpoint exists in the mock store yet, so the list is synthesized deterministically from the VM record.
 
-**Click row** → admin VM detail.
+**Panel empty state:** when no workspace is selected, the panel shows a centered "Select a workspace / Pick a row from the table to see details and take action." with a `MousePointerClick` icon in `--text-tertiary`.
+
+Selection state uses the same state-as-truth + `history.replaceState` mirror pattern as the developer surface (see screens/developer.md) — rapid row-clicks won't drop panel updates via Next.js router coalescing.
+
+Below ~1200px viewport width, the grid collapses to a single column: table on top, panel below.
 
 ## Screen 3 — Fleet Utilization (`/admin/utilization`)
 
