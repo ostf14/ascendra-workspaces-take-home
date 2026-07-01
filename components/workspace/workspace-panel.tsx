@@ -62,9 +62,9 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
         aria-label="Current usage"
         className="flex items-center justify-around gap-6 rounded-md border border-border-subtle bg-surface-page px-6 py-5"
       >
-        <UsageCircle label="CPU" value={workspace.cpu} size={56} />
-        <UsageCircle label="Memory" value={workspace.memory} size={56} />
-        <UsageCircle label="Disk" value={workspace.disk} size={56} />
+        <UsageCircle label="CPU" value={workspace.cpu} size="md" />
+        <UsageCircle label="Memory" value={workspace.memory} size="md" />
+        <UsageCircle label="Disk" value={workspace.disk} size="md" />
       </div>
 
       <WorkspaceMetricsChart id={workspace.id} />

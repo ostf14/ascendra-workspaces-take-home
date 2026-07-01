@@ -30,7 +30,7 @@ One card per row. Padding 12/14, gap 6 between cards, `--radius-md` corners.
 Content per compact card:
 - **Row 1** — workspace name (mono, `--text-sm`, weight 500) + status pill on the right
 - **Row 2** — template name (`--text-xs`, `--text-tertiary`) with " · Idle 38h" as an inline text modifier in `--status-idle` when applicable (idle is NOT a pill — see the rename note below)
-- **Row 3** — one 16px `UsageCircle` (same threshold coloring as the panel; value hidden at that size) + "CPU 34%" text
+- **Row 3** — three usage metrics inline — CPU, Memory, Disk. Each: 16px circle (threshold-coloured, no inner label) + text "CPU 34%". Separated by ` · `. All three shown even when a metric is near-zero — visual rhythm across the list matters more than saving one column.
 
 No memory, disk, or action buttons at this altitude — the panel handles all of that.
 
@@ -116,7 +116,7 @@ Not a screen — UI behaviour shared by both the compact card row (status pill f
 
 - **StatusBadge** — visual treatment per status: running (green), stopped (gray), starting / stopping (amber with motion), error (red). Never carries idle.
 - **IdleIndicator** — inline text " · Idle N" in `--status-idle` when `workspace.isIdle` is true. No background, no border. Lives at `components/workspace/idle-pill.tsx` (path kept from the pill it replaces to avoid rename churn).
-- **UsageCircle** — SVG donut sized 16 / 36 / 56px, threshold-coloured (neutral < 60, amber 60–85, red ≥ 85). 16px on the compact card (no value inside), 56px in the panel usage row (value inside).
+- **UsageCircle** — SVG donut with three size presets, threshold-coloured (neutral < 60, amber 60–85, red ≥ 85). `size="xs"` → 16px, no inner value, no caption — used inline with text on the compact card's three-metric row. `size="sm"` → 36px, inner percentage, caption underneath — the default. `size="md"` → 56px, inner percentage, caption underneath — used in the panel's current-usage row.
 - **CompactWorkspaceCard** — the left-column row: name + status + template · idle text + one 16px CPU circle. Wrapped in `WorkspaceActionsContext` so right-click opens the shared menu.
 - **WorkspacePanel / WorkspacePanelEmpty / WorkspacePanelSkeleton** — right-column contents in the three states.
 - **LifecycleControls** — the state-machine actions row. Takes an optional `onOpen` render prop that returns the running-state primary — the developer surface plugs `ConnectPopover` in.

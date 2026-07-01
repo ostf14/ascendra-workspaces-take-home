@@ -42,18 +42,30 @@ export function CompactWorkspaceCard({
             <IdleIndicator lastActiveAt={workspace.lastActiveAt} />
           ) : null}
         </div>
-        <div className="mt-1 flex items-center gap-2">
-          <UsageCircle
-            label="CPU"
-            value={workspace.cpu}
-            size={16}
-            showLabel={false}
-          />
-          <span className="text-xs text-text-secondary">
-            CPU {Math.round(workspace.cpu)}%
+        <div className="mt-1 flex items-center gap-x-2 gap-y-1 text-xs text-text-secondary">
+          <MetricInline label="CPU" value={workspace.cpu} />
+          <span aria-hidden className="text-text-tertiary">
+            ·
           </span>
+          <MetricInline label="Memory" value={workspace.memory} />
+          <span aria-hidden className="text-text-tertiary">
+            ·
+          </span>
+          <MetricInline label="Disk" value={workspace.disk} />
         </div>
       </button>
     </WorkspaceActionsContext>
+  );
+}
+
+function MetricInline({ label, value }: { label: string; value: number }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <UsageCircle label={label} value={value} size="xs" />
+      <span>
+        {label}{" "}
+        <span className="font-mono tabular-nums">{Math.round(value)}%</span>
+      </span>
+    </span>
   );
 }
