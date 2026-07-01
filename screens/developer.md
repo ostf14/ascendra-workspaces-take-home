@@ -44,18 +44,18 @@ Right-click any compact card opens a context menu with **Rename / Duplicate / Co
 
 Layout top to bottom (no section titles inside, apart from the collapsible logs):
 
-**Header block.** Workspace name in mono, `--text-2xl`, weight 500. Status pill sits inline to the right, followed by " · Idle 38h" text modifier when applicable. Below the name row: template · region · provisioned date, joined by " · " separators, all in `--text-sm`, `--text-tertiary`.
+**Panel header.** Two-column layout. Left: workspace name (mono, `--text-2xl`, weight 500), status pill inline, idle text modifier ("· Idle 38h" in `--status-idle`) if applicable. Right: `LifecycleControls` (Primary + Sec 1 + Sec 2 + kebab per state machine). Vertically centered against the name row.
 
-**Actions row.** One horizontal row of buttons, aligned left. Same state machine described below.
+**Sub-header.** Directly below the header row: `templateName · region · Provisioned MMM d, yyyy`, all in `--text-sm`, `--text-tertiary`.
 
-**Metadata strip.** Single horizontal row with vertical dividers:
-- Uptime (relative — "3h 14m")
-- Session cost (`--text-md`, JetBrains Mono — the emphasised value)
-- Hourly cost (`--text-xs`, `--text-tertiary`)
+**Stats row.** Single container with two blocks:
+- Left: three `UsageCircle` components at `size="md"` (56px) for CPU / Memory / Disk, with labels below each circle.
+- Right: three text metrics (Uptime / Session cost / Hourly cost), labels above values.
+  - Uptime — `--text-base`, JetBrains Mono, weight 500, `--text-primary`. Reads "—" when the workspace is stopped.
+  - Session cost — `--text-2xl`, JetBrains Mono, weight 500, `--text-primary`. The hero value in the block.
+  - Hourly cost — `--text-sm`, JetBrains Mono, weight 400, `--text-tertiary` (e.g. `$0.14/hr`).
 
-Uptime is "—" when the workspace is stopped.
-
-**Current usage.** Three 56px `UsageCircle`s (CPU / Memory / Disk) in a row inside a bordered strip.
+The stats row sits inside a subtle container (`--surface-secondary`, `--radius-md`, 24px padding). At panel widths below ~880px it wraps to stack the circles above the text block via a container query — the layout doesn't rely on viewport width because the 320px sidebar reshapes the panel independently.
 
 **Metrics charts.** Two-column grid — CPU on the left, Memory on the right. Range toggle (1h / 24h) sits in the section's own header (unchanged from before).
 

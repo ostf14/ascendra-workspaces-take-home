@@ -31,18 +31,24 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
       aria-label={`Workspace ${workspace.name}`}
       className="flex flex-col gap-6 rounded-lg border border-border-default bg-surface-elevated p-6"
     >
-      <header className="flex flex-col gap-2">
-        <div className="flex flex-wrap items-center gap-3">
-          <h1 className="font-mono text-2xl font-medium text-text-primary">
-            {workspace.name}
-          </h1>
-          <StatusBadge status={workspace.status} />
-          {workspace.isIdle ? (
-            <IdleIndicator
-              lastActiveAt={workspace.lastActiveAt}
-              className="text-sm"
-            />
-          ) : null}
+      <header className="flex flex-col gap-1">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <h1 className="font-mono text-2xl font-medium text-text-primary">
+              {workspace.name}
+            </h1>
+            <StatusBadge status={workspace.status} />
+            {workspace.isIdle ? (
+              <IdleIndicator
+                lastActiveAt={workspace.lastActiveAt}
+                className="text-sm"
+              />
+            ) : null}
+          </div>
+          <LifecycleControls
+            workspace={workspace}
+            onOpen={() => <ConnectPopover workspace={workspace} />}
+          />
         </div>
         <p className="text-sm text-text-tertiary">
           {workspace.templateName} · {workspace.region} · Provisioned{" "}
@@ -50,22 +56,7 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
         </p>
       </header>
 
-      <LifecycleControls
-        workspace={workspace}
-        onOpen={() => <ConnectPopover workspace={workspace} />}
-      />
-
-      <MetadataStrip workspace={workspace} />
-
-      <div
-        role="group"
-        aria-label="Current usage"
-        className="flex items-center justify-around gap-6 rounded-md border border-border-subtle bg-surface-page px-6 py-5"
-      >
-        <UsageCircle label="CPU" value={workspace.cpu} size="md" />
-        <UsageCircle label="Memory" value={workspace.memory} size="md" />
-        <UsageCircle label="Disk" value={workspace.disk} size="md" />
-      </div>
+      <StatsRow workspace={workspace} />
 
       <WorkspaceMetricsChart id={workspace.id} />
 
@@ -77,61 +68,55 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
   );
 }
 
-function MetadataStrip({ workspace }: { workspace: VM }) {
+function StatsRow({ workspace }: { workspace: VM }) {
   return (
-    <dl className="flex flex-wrap items-center gap-x-5 gap-y-3 rounded-md border border-border-subtle bg-surface-page px-5 py-4">
-      <StripField label="Uptime" value={formatUptime(workspace)} />
-      <Divider />
-      <StripField
-        label="Session cost"
-        value={formatCurrency(sessionCost(workspace))}
-        emphasis
-      />
-      <Divider />
-      <StripField
-        label="Hourly cost"
-        value={`${formatCurrency(workspace.hourlyCost)}/hr`}
-        muted
-      />
-    </dl>
-  );
-}
-
-function StripField({
-  label,
-  value,
-  emphasis = false,
-  muted = false,
-}: {
-  label: string;
-  value: string;
-  emphasis?: boolean;
-  muted?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-0.5">
-      <dt className="text-xs text-text-tertiary">{label}</dt>
-      <dd
-        className={
-          emphasis
-            ? "font-mono text-md font-medium text-text-primary tabular-nums"
-            : muted
-            ? "font-mono text-xs text-text-tertiary tabular-nums"
-            : "font-mono text-sm text-text-primary tabular-nums"
-        }
-      >
-        {value}
-      </dd>
+    <div
+      role="group"
+      aria-label="Workspace stats"
+      className="@container/stats"
+    >
+      <div className="flex flex-wrap items-center gap-x-16 gap-y-6 rounded-md bg-surface-secondary px-6 py-5 @max-[880px]/stats:flex-col @max-[880px]/stats:items-start">
+        <div className="flex items-center gap-8">
+          <UsageCircle label="CPU" value={workspace.cpu} size="md" />
+          <UsageCircle label="Memory" value={workspace.memory} size="md" />
+          <UsageCircle label="Disk" value={workspace.disk} size="md" />
+        </div>
+        <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-4">
+          <StatField
+            label="Uptime"
+            value={formatUptime(workspace)}
+            valueClassName="text-base font-mono font-medium text-text-primary tabular-nums"
+          />
+          <StatField
+            label="Session cost"
+            value={formatCurrency(sessionCost(workspace))}
+            valueClassName="text-2xl font-mono font-medium text-text-primary tabular-nums leading-none"
+          />
+          <StatField
+            label="Hourly cost"
+            value={`${formatCurrency(workspace.hourlyCost)}/hr`}
+            valueClassName="text-sm font-mono text-text-tertiary tabular-nums"
+          />
+        </dl>
+      </div>
     </div>
   );
 }
 
-function Divider() {
+function StatField({
+  label,
+  value,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  valueClassName: string;
+}) {
   return (
-    <span
-      aria-hidden
-      className="hidden h-8 w-px bg-border-subtle sm:inline-block"
-    />
+    <div className="flex flex-col gap-1">
+      <dt className="text-xs text-text-tertiary">{label}</dt>
+      <dd className={valueClassName}>{value}</dd>
+    </div>
   );
 }
 
@@ -159,12 +144,14 @@ export function WorkspacePanelEmpty() {
 export function WorkspacePanelSkeleton() {
   return (
     <section className="flex flex-col gap-6 rounded-lg border border-border-default bg-surface-elevated p-6">
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-8 w-64" />
-        <Skeleton className="h-4 w-80" />
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-2">
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-80" />
+        </div>
+        <Skeleton className="h-10 w-56" />
       </div>
-      <Skeleton className="h-10 w-72" />
-      <Skeleton className="h-16 w-full" />
+      <Skeleton className="h-28 w-full" />
       <Skeleton className="h-40 w-full" />
     </section>
   );
