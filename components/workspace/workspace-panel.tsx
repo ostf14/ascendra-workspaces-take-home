@@ -82,20 +82,14 @@ function StatsRow({ workspace }: { workspace: VM }) {
           <UsageCircle label="Disk" value={workspace.disk} size="md" />
         </div>
         <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-4">
-          <StatField
-            label="Uptime"
-            value={formatUptime(workspace)}
-            valueClassName="text-base font-mono font-medium text-text-primary tabular-nums"
-          />
+          <StatField label="Uptime" value={formatUptime(workspace)} />
           <StatField
             label="Session cost"
             value={formatCurrency(sessionCost(workspace))}
-            valueClassName="text-2xl font-mono font-medium text-text-primary tabular-nums leading-none"
           />
           <StatField
             label="Hourly cost"
             value={`${formatCurrency(workspace.hourlyCost)}/hr`}
-            valueClassName="text-sm font-mono text-text-tertiary tabular-nums"
           />
         </dl>
       </div>
@@ -103,19 +97,13 @@ function StatsRow({ workspace }: { workspace: VM }) {
   );
 }
 
-function StatField({
-  label,
-  value,
-  valueClassName,
-}: {
-  label: string;
-  value: string;
-  valueClassName: string;
-}) {
+function StatField({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
       <dt className="text-xs text-text-tertiary">{label}</dt>
-      <dd className={valueClassName}>{value}</dd>
+      <dd className="font-mono text-base font-medium text-text-primary tabular-nums">
+        {value}
+      </dd>
     </div>
   );
 }

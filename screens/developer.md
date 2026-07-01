@@ -50,10 +50,7 @@ Layout top to bottom (no section titles inside, apart from the collapsible logs)
 
 **Stats row.** Single container with two blocks:
 - Left: three `UsageCircle` components at `size="md"` (56px) for CPU / Memory / Disk, with labels below each circle.
-- Right: three text metrics (Uptime / Session cost / Hourly cost), labels above values.
-  - Uptime — `--text-base`, JetBrains Mono, weight 500, `--text-primary`. Reads "—" when the workspace is stopped.
-  - Session cost — `--text-2xl`, JetBrains Mono, weight 500, `--text-primary`. The hero value in the block.
-  - Hourly cost — `--text-sm`, JetBrains Mono, weight 400, `--text-tertiary` (e.g. `$0.14/hr`).
+- Right: three text metrics (Uptime / Session cost / Hourly cost) — labels above, values below. Every value is `--text-base`, JetBrains Mono, weight 500, `--text-primary`. No hero; the block reads as three equivalent metric slots. Labels stay `--text-xs`, `--text-tertiary`, weight 400. Uptime reads "—" when the workspace is stopped.
 
 The stats row sits inside a subtle container (`--surface-secondary`, `--radius-md`, 24px padding). At panel widths below ~880px it wraps to stack the circles above the text block via a container query — the layout doesn't rely on viewport width because the 320px sidebar reshapes the panel independently.
 
