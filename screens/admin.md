@@ -81,8 +81,7 @@ Below ~1200px viewport width, the grid collapses to a single column: table on to
 
 Analytical view. Where the admin goes to understand patterns, not to act.
 
-- Time range selector: 1h / 24h / 7d / 30d
-- Aggregate CPU and memory line chart over the selected range
+- Aggregate CPU and memory area chart at the top of the page (shared `AdminOverviewChart` component with the overview surface). Range selector sits inside the chart card header — 1h / 24h / 7d / 30d tabs to the right of the legend — with `24h` selected by default. The chart title reads `Aggregate utilization · last {range}` and updates as the range changes. The selector used to live in the page header alongside the H1; it moved into the chart card because that's where the reader looks when they want to change the window of the data below. Keeping it in the page header meant the eye traveled up-then-down every time; inline in the card header, it's one glance.
 - **Distribution chart** — histogram of current CPU% across all running workspaces. Not a pie chart (see decision 03). Reveals "half the fleet is idle, half is hot" vs "everything sits at 50%" — these look identical in an aggregate average.
 - Optional: cost breakdown by template
 

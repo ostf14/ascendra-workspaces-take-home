@@ -23,44 +23,19 @@ export default function AdminUtilizationPage() {
 
   return (
     <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-6 py-8">
-      <header className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-lg font-medium leading-tight text-text-primary">Utilization</h1>
-          <p className="text-sm text-text-secondary">
-            Where the fleet sits, and how the load shifts across the day.
-          </p>
-        </div>
-        <div
-          role="tablist"
-          aria-label="Time range"
-          className="inline-flex items-center gap-1 rounded-md border border-border-default p-0.5"
-        >
-          {RANGES.map((option) => (
-            <button
-              key={option.value}
-              role="tab"
-              aria-selected={range === option.value}
-              type="button"
-              onClick={() => setRange(option.value)}
-              className={cn(
-                "rounded-sm px-2.5 py-1 text-xs transition-colors",
-                range === option.value
-                  ? "bg-surface-secondary text-text-primary"
-                  : "text-text-tertiary hover:text-text-primary"
-              )}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
+      <header className="flex flex-col gap-1">
+        <h1 className="text-lg font-medium leading-tight text-text-primary">Utilization</h1>
+        <p className="text-sm text-text-secondary">
+          Where the fleet sits, and how the load shifts across the day.
+        </p>
       </header>
 
       <div key={range} className="animate-fade-in">
         <AdminOverviewChart
-          series={
-            data ? { cpu: data.cpu, memory: data.memory } : undefined
-          }
+          series={data ? { cpu: data.cpu, memory: data.memory } : undefined}
           loading={isPending}
+          rangeLabel={range}
+          rangeControl={<RangeTabs value={range} onChange={setRange} />}
         />
       </div>
 
@@ -78,5 +53,39 @@ export default function AdminUtilizationPage() {
         )}
       </div>
     </section>
+  );
+}
+
+function RangeTabs({
+  value,
+  onChange,
+}: {
+  value: FleetUtilizationRange;
+  onChange: (next: FleetUtilizationRange) => void;
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Time range"
+      className="inline-flex items-center gap-0.5 rounded-md border border-border-default p-0.5"
+    >
+      {RANGES.map((option) => (
+        <button
+          key={option.value}
+          role="tab"
+          aria-selected={value === option.value}
+          type="button"
+          onClick={() => onChange(option.value)}
+          className={cn(
+            "rounded-sm px-2 py-0.5 font-mono text-[11px] transition-colors",
+            value === option.value
+              ? "bg-surface-elevated text-text-primary"
+              : "text-text-tertiary hover:text-text-primary"
+          )}
+        >
+          {option.label}
+        </button>
+      ))}
+    </div>
   );
 }

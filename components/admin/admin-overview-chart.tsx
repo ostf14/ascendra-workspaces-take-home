@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   Area,
   AreaChart,
@@ -37,9 +38,13 @@ function merge(series: Series): MergedPoint[] {
 export function AdminOverviewChart({
   series,
   loading = false,
+  rangeLabel = "24h",
+  rangeControl,
 }: {
   series?: Series;
   loading?: boolean;
+  rangeLabel?: string;
+  rangeControl?: ReactNode;
 }) {
   if (loading || !series) {
     return (
@@ -53,31 +58,34 @@ export function AdminOverviewChart({
 
   return (
     <section
-      aria-label="Aggregate utilization, last 24h"
+      aria-label={`Aggregate utilization, last ${rangeLabel}`}
       className="flex h-full min-h-[280px] flex-col rounded-md bg-surface-secondary"
     >
-      <header className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 pt-4 pb-3">
         <h2 className="text-sm font-medium text-text-primary">
-          Aggregate utilization · last 24h
+          Aggregate utilization · last {rangeLabel}
         </h2>
-        <ul className="flex items-center gap-4 text-xs text-text-tertiary">
-          <li className="inline-flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="inline-block size-2 rounded-full"
-              style={{ background: "var(--accent)" }}
-            />
-            CPU
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span
-              aria-hidden
-              className="inline-block size-2 rounded-full"
-              style={{ background: "var(--color-chart-2)" }}
-            />
-            Memory
-          </li>
-        </ul>
+        <div className="flex flex-wrap items-center gap-4">
+          <ul className="flex items-center gap-4 text-xs text-text-tertiary">
+            <li className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="inline-block size-2 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+              CPU
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <span
+                aria-hidden
+                className="inline-block size-2 rounded-full"
+                style={{ background: "var(--color-chart-2)" }}
+              />
+              Memory
+            </li>
+          </ul>
+          {rangeControl}
+        </div>
       </header>
       <div className="min-h-64 flex-1 px-5 pb-4">
         <ResponsiveContainer width="100%" height="100%">
