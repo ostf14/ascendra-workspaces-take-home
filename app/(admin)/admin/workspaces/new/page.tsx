@@ -64,7 +64,8 @@ export default function AdminProvisionWorkspacePage() {
     provision.mutate(
       { templateId, ownerId, name },
       {
-        onSuccess: (vm) => router.push(`/admin/workspaces/${vm.id}`),
+        onSuccess: (vm) =>
+          router.push(`/admin/workspaces?w=${encodeURIComponent(vm.id)}`),
       }
     );
   }
