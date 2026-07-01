@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,29 +16,61 @@ import { WorkspacesEmptyState } from "@/components/workspace/workspaces-empty-st
 import { useWorkspaces } from "@/lib/hooks/use-workspaces";
 import type { VM } from "@/lib/domain/types";
 
+function readParamFromLocation(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return new URLSearchParams(window.location.search).get("w") ?? undefined;
+}
+
 export default function WorkspacesPage() {
   const { data, isPending } = useWorkspaces();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const workspaces = data ?? [];
 
-  const paramId = searchParams.get("w");
+  // Selection lives in React state. The URL is a mirror, not the source of
+  // truth — see notes below. Initial value comes from the ?w= param the page
+  // was loaded with; after that, state drives the URL, not the other way
+  // around (except for popstate — see effect below).
+  const [selectedId, setSelectedId] = useState<string | undefined>(
+    () => searchParams.get("w") ?? undefined
+  );
+
   const selected = useMemo<VM | undefined>(() => {
     if (!workspaces.length) return undefined;
-    const fromParam = paramId
-      ? workspaces.find((w) => w.id === paramId)
+    const fromId = selectedId
+      ? workspaces.find((w) => w.id === selectedId)
       : undefined;
-    return fromParam ?? workspaces[0];
-  }, [workspaces, paramId]);
+    return fromId ?? workspaces[0];
+  }, [workspaces, selectedId]);
 
-  const selectWorkspace = useCallback(
-    (id: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set("w", id);
-      router.replace(`/workspaces?${params.toString()}`, { scroll: false });
-    },
-    [router, searchParams]
-  );
+  const selectWorkspace = useCallback((id: string) => {
+    setSelectedId(id);
+  }, []);
+
+  // Mirror selection into the URL for bookmarking / sharing. Uses the History
+  // API directly instead of Next.js's router: router.replace() coalesces
+  // synchronous calls under rapid-fire clicks and can drop them entirely.
+  // replaceState is synchronous, cannot be coalesced, and does NOT trigger
+  // a Next.js route transition — which is what we want, since selection is
+  // already reflected in local state.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const target = selectedId ? `/workspaces?w=${selectedId}` : "/workspaces";
+    if (window.location.pathname + window.location.search === target) return;
+    window.history.replaceState({}, "", target);
+  }, [selectedId]);
+
+  // Two-way sync: react to the URL changing from outside — browser back /
+  // forward, or a paste-in-tab. popstate fires on those transitions; we
+  // re-read the param and update state to match. Our own replaceState calls
+  // do NOT fire popstate, so this loop can't feed itself.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onPopState = () => {
+      setSelectedId(readParamFromLocation());
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   if (!isPending && workspaces.length === 0) {
     return (
