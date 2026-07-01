@@ -42,7 +42,7 @@ Each lifecycle action has a one-line hint, visible on hover or beneath the butto
 - **Recreate** → "Home directory preserved. Installed packages and system changes will be reset."
 - **Delete** → "All data for this workspace will be deleted." Confirmation modal with typed-name verification.
 
-On the list card, the hint surfaces in a tooltip rather than always visible (space constraint).
+On the developer surface (`/workspaces`, master-detail), the hints live in the panel's actions row — surfaced as shadcn Tooltips on hover of Stop / Restart / Recreate. Because the developer surface is now a single always-visible panel per workspace (see screens/developer.md), every lifecycle action lives in one place; the earlier "tooltip on the card + full hint on detail" split disappears.
 
 Visual hierarchy: Delete is treated differently from Stop / Restart / Recreate — different color, separated in the menu, never adjacent to safe actions.
 

@@ -28,15 +28,17 @@ A persistent panel of three options costs nothing after the first use, because t
 
 ## Implementation notes
 
-The connection panel sits on the workspace detail page as a row of three actions:
+On the developer surface (`/workspaces`, master-detail), the three methods surface via a **Popover** anchored on the workspace panel's "Open" button. The Open button only appears on the running-state primary slot in the panel's actions row, so the popover cannot be reached from a stopped or transitioning workspace — the state machine already communicates that connect is unavailable.
 
 - **VS Code Desktop** → anchor with `vscode://vscode-remote/ssh-remote+...` href; the OS's URL handler launches local VS Code with the remote target preconfigured.
 - **Open in browser** → anchor to `https://{workspace-id}.ascendra.app`; opens in a new tab.
 - **Copy SSH command** → button copying `ssh user@{workspace-id}.ascendra.app` to clipboard.
 
-All three are stubs for this exercise — the targets don't resolve to anything real, but the affordances behave correctly (URL scheme triggers, new tab opens, clipboard populates).
+All three are stubs for this exercise — the targets don't resolve to anything real, but the affordances behave correctly (URL scheme triggers, new tab opens, clipboard populates). The popover closes on selection or click outside.
 
-The panel is enabled only when status is `running`. In other states it stays visible but inert, with a one-line hint explaining the workspace must be started first.
+The popover replaces an earlier right-side Sheet that opened from the same button on the card layout. In master-detail the panel already carries the metrics and the lifecycle actions the sheet used to duplicate; only the connect choice needed to survive, and a popover is a lighter answer than a full sheet for a three-item choice.
+
+The admin workspace detail page (a separate audit surface, not the developer's home) keeps the persistent three-card `ConnectPanel` — admins reach this screen rarely and the extra explicitness is worth the vertical space there.
 
 ## What this rules out
 

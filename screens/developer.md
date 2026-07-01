@@ -13,120 +13,127 @@ Sections live under `/workspaces/*`. Admins see this section too — these are t
 5. **Recover** from a failed workspace (error state).
 6. **Wait through a long start** — provisioning or cold-start that takes minutes, not seconds. Common enough in the category to design around (community discussions of Codespaces and Coder repeatedly cite multi-minute starts as a top frustration).
 
-These collapse into two screens and two flows.
+These collapse into one screen (`/workspaces`) and one flow (`/workspaces/new`). The standalone `/workspaces/[id]` route is retired — it now redirects to `/workspaces?w=[id]`, and the detail lives inside the always-visible right-hand panel.
 
-## Screen 1 — Workspaces list (`/workspaces`)
+## Screen — Workspaces (`/workspaces`)
 
-Home page for the developer. First view after sign-in.
+Home page for the developer. First view after sign-in. Master-detail layout — the workspace list is a permanent 320px left column, the detail sits in a right panel that fills the remaining width and is always visible.
 
-**Per workspace card:**
-- Name (human-friendly, e.g. `emerald-panther-54`)
-- Status badge
-- Template name
-- Idle pill below the template name when `isIdle` — "Idle · 38h" in the idle status color (`#CA8A04`)
-- Current usage — three circular gauges (CPU / Memory / Disk) with threshold-aware fill colour (neutral / amber / red)
-- Action group at the bottom — see the state machine below
+Selection is a URL param: `/workspaces?w=vm-acting-1`. On page load, if `?w=` is present and valid, that workspace is selected; otherwise the first workspace in the list. If the list is empty, the empty state replaces both columns.
 
-**Page chrome:**
-- "New workspace" button (top right)
-- No filtering — a developer typically has 1–5 workspaces
+### Left column — compact card list
 
-**Empty state:** headline + one-line description + CTA to create the first workspace.
+Header row above the list: "Workspaces" label on the left, "+" icon button on the right (new workspace). 1px bottom border, sits flush with the first card.
 
-### Card / detail action group
+One card per row. Padding 12/14, gap 6 between cards, `--radius-md` corners.
 
-One row of buttons, never two. Layout:
+Content per compact card:
+- **Row 1** — workspace name (mono, `--text-sm`, weight 500) + status pill on the right
+- **Row 2** — template name (`--text-xs`, `--text-tertiary`) with " · Idle 38h" as an inline text modifier in `--status-idle` when applicable (idle is NOT a pill — see the rename note below)
+- **Row 3** — one 16px `UsageCircle` (same threshold coloring as the panel; value hidden at that size) + "CPU 34%" text
 
-```
-[Primary] [Secondary 1] [Secondary 2] [Kebab]
-```
+No memory, disk, or action buttons at this altitude — the panel handles all of that.
 
-State-to-button mapping:
+Selected state: border becomes `--accent` (1px, not thicker), background gets a very light tint via `color-mix(in oklab, var(--accent) 5%, transparent)`.
 
-| Status     | Primary               | Secondary 1 | Secondary 2 | Kebab  |
-|------------|-----------------------|-------------|-------------|--------|
-| `running`  | `Open` (coral)        | `Stop`      | `Restart`   | Delete |
-| `stopped`  | `Start` (coral)       | —           | —           | Delete |
-| `starting` | `Starting…` (coral, disabled, spinner) | hidden | hidden | hidden |
-| `stopping` | `Stopping…` (coral, disabled, spinner) | hidden | hidden | hidden |
-| `error`    | `Restart` (coral)     | `Recreate`  | —           | Delete |
+Hover state (unselected): background swaps to `--surface-secondary`, cursor is pointer.
+
+Right-click any compact card opens a context menu with **Rename / Duplicate / Copy ID / Delete** — same items the panel kebab shows, backed by the shared `useWorkspaceActionsState`.
+
+### Right column — detail panel
+
+Layout top to bottom (no section titles inside, apart from the collapsible logs):
+
+**Header block.** Workspace name in mono, `--text-2xl`, weight 500. Status pill sits inline to the right, followed by " · Idle 38h" text modifier when applicable. Below the name row: template · region · provisioned date, joined by " · " separators, all in `--text-sm`, `--text-tertiary`.
+
+**Actions row.** One horizontal row of buttons, aligned left. Same state machine described below.
+
+**Metadata strip.** Single horizontal row with vertical dividers:
+- Uptime (relative — "3h 14m")
+- Session cost (`--text-md`, JetBrains Mono — the emphasised value)
+- Hourly cost (`--text-xs`, `--text-tertiary`)
+
+Uptime is "—" when the workspace is stopped.
+
+**Current usage.** Three 56px `UsageCircle`s (CPU / Memory / Disk) in a row inside a bordered strip.
+
+**Metrics charts.** Two-column grid — CPU on the left, Memory on the right. Range toggle (1h / 24h) sits in the section's own header (unchanged from before).
+
+**Logs.** Collapsible, closed by default (open by default when the workspace is in error).
+
+### Empty state (panel)
+
+When no workspace is selected — the list is empty of a fallback for `?w=` — the panel shows a centered empty state: a small icon (Lucide `LayoutGrid`), "Select a workspace" headline, and a one-line hint below in `--text-tertiary`.
+
+### State machine (applied to the panel actions row)
+
+| Status | Primary | Sec 1 | Sec 2 | Kebab |
+|---|---|---|---|---|
+| running | Open (opens Connect popover) | Stop | Restart | Rename / Duplicate / Copy ID / Delete |
+| stopped | Start | — | — | Rename / Duplicate / Copy ID / Delete |
+| starting | Starting · ~12s (disabled, live countdown) | — | — | — |
+| stopping | Stopping · ~12s (disabled, live countdown) | — | — | — |
+| error | Restart | Recreate | — | Rename / Duplicate / Copy ID / Delete |
 
 Rules:
-- Exactly one primary action visible at any time. Never two.
-- Transitions (`starting` / `stopping`) hide every other affordance, including the kebab. Disabled-and-greyed buttons during transitions read as a visual mess; hide instead.
-- `Open` is rendered as a primary only on the **card** (Screen 1). It opens a right-side preview sheet (420px wide) listing the three connect methods from decision 02 alongside metrics + Stop / Restart shortcuts + a "Open full workspace detail →" footer link.
-- `Stop` is a ghost (secondary) button and uses the `CircleStop` icon to read as "stop transport" rather than "empty checkbox".
+- Exactly one primary button visible at a time.
+- Secondary actions are HIDDEN (not disabled) during transitions to avoid a wall of dimmed controls.
+- The kebab is hidden during transitions; it comes back once the state settles.
+- Open behaviour: the button opens a Popover anchored below it with the three connect methods (VS Code desktop / Open in browser / Copy SSH). The popover closes on selection or click outside. There is no route change on Open.
 
-The same state machine drives the detail page's lifecycle controls (Screen 2), with one variant: the detail page does not pass `onOpen`, so the running primary slot stays empty there — the detail surface already exposes the connect choice through the inline ConnectPanel.
+Persistence hints (per decision 04) surface as tooltips on Stop / Restart / Recreate, and as an inline confirmation modal for Delete (typed-name verification).
 
-## Screen 2 — Workspace detail (`/workspaces/[id]`)
+## Rename — idle is text, not a pill
 
-Reached by clicking a card. Where the developer connects, diagnoses, and manages one specific machine.
+Idle stops being a badge. It becomes an inline text modifier that follows the status pill wherever the status pill appears:
 
-**Top region:** workspace name, status badge, lifecycle controls (Start / Stop / Restart contextual to status), connect panel (see decision 02). Each lifecycle control surfaces its persistence behaviour at the point of interaction (see decision 04).
+`● Running · Idle 38h`
 
-**Metrics region:** current usage as numbers, plus CPU and memory time-series for the last hour and last 24 hours.
+The status pill remains a pill (green for Running, etc.). The " · Idle 38h" text sits next to it in `--status-idle`, no background, no border, no icon. Same rule on the compact card and in the panel header. The admin detail page follows the same rule.
 
-**Metadata region:** template name, specs (vCPU / RAM / disk), region, uptime, created at, hourly cost, accumulated session cost.
+## Flow — Create new workspace
 
-**Optional regions:**
-- Idle hint when applicable: "Idle for 12 minutes. Auto-stops in 18 minutes." Icon in `--status-idle`, text in `--text-secondary`.
-- Logs (collapsed by default). Timestamped INFO/WARN/ERROR lines in JetBrains Mono.
-
-The lifecycle controls in the top region follow the same state machine as the card (see Screen 1 above). The detail page does not show an `Open` primary on `running` — the inline ConnectPanel already exposes the three connect methods at the same level of visibility.
-
-## Flow 1 — Create new workspace
-
-Triggered by "New workspace" button. Modal or route (`/workspaces/new`).
+Triggered by "+" in the list header. Modal or route (`/workspaces/new`).
 
 1. Pick a template — card grid with name, base image, specs, preinstalled tools.
 2. Name the workspace — autogenerated suggestion, editable.
 3. Confirm.
-4. Redirect to detail page; status passes through `starting` to `running`.
+4. Redirect to `/workspaces?w=[new-id]`; status passes through `starting` to `running`.
 
-Provisioning a new VM takes longer than starting an existing one — typically minutes for first launch. This is reflected as a longer `starting` phase, not a separate state, but the UI communicates progress: a labelled step indicator ("Provisioning VM → Pulling image → Installing dependencies → Starting services") plus elapsed time. The user can navigate away and return; on return, status is restored.
+Provisioning a new VM takes longer than starting an existing one — typically minutes for first launch. This is reflected as a longer `starting` phase, not a separate state, but the UI communicates progress: a labelled step indicator ("Provisioning VM → Pulling image → Installing dependencies → Starting services") plus elapsed time. The user can navigate away and return; on return, selection is restored via `?w=`.
 
-## Flow 2 — Lifecycle transitions
+## Lifecycle transitions
 
-Not a screen. UI behaviour shared across both screens.
+Not a screen — UI behaviour shared by both the compact card row (status pill flips) and the panel actions row (state machine table above).
 
-- Optimistic update — card / detail reflects intended status immediately on click.
-- During `starting` / `stopping`, a progress indicator is visible. For long starts (cold provisioning), the indicator includes a labelled step ("Pulling image", "Starting services") rather than an unlabelled spinner.
-- Buttons that don't apply in the transitional state are disabled.
-- On success, status moves to the terminal state.
+- Optimistic update — card AND panel reflect intended status immediately on click.
+- During `starting` / `stopping`, the panel shows the disabled countdown button (`Starting · ~12s`, decrementing every second; `almost done…` once the expected 12s window is past). The compact card's status pill shows the transitional variant with soft pulse.
+- Buttons that don't apply in the transitional state are hidden, not disabled.
+- On success, status moves to the terminal state; kebab and secondary actions reappear.
 - On failure, status flips to `error` with a brief reason and a retry action.
-- During transitions, the primary pseudo-button label shows estimated time remaining (`Starting · ~12s`, decrementing every second). On the detail page the labelled step indicator also surfaces `~Xs remaining`. Once elapsed has crossed the expected window (`EXPECTED_TRANSITION_SECONDS = 12`), both switch to `almost done…`. The expected duration is the mid of the mock 8-15s window; cold provisioning lands in the "almost done" branch which is the honest reading — we don't fake a percent number.
-- Stopping uses its own labelled steps on the detail page: `Stopping services → Persisting state → Shutting down VM`.
 
 ## Component inventory
 
-- **StatusBadge** — visual treatment per status: running (green), stopped (gray), starting / stopping (amber with motion), error (red).
-- **UsageMetric** — number + unit + percentage + optional sparkline.
-- **LifecycleControls** — context-aware button group; visible buttons change with status.
-- **ConnectPanel** — three connect actions (see decision 02).
-- **WorkspaceCard** — list item on screen 1.
+- **StatusBadge** — visual treatment per status: running (green), stopped (gray), starting / stopping (amber with motion), error (red). Never carries idle.
+- **IdleIndicator** — inline text " · Idle N" in `--status-idle` when `workspace.isIdle` is true. No background, no border. Lives at `components/workspace/idle-pill.tsx` (path kept from the pill it replaces to avoid rename churn).
+- **UsageCircle** — SVG donut sized 16 / 36 / 56px, threshold-coloured (neutral < 60, amber 60–85, red ≥ 85). 16px on the compact card (no value inside), 56px in the panel usage row (value inside).
+- **CompactWorkspaceCard** — the left-column row: name + status + template · idle text + one 16px CPU circle. Wrapped in `WorkspaceActionsContext` so right-click opens the shared menu.
+- **WorkspacePanel / WorkspacePanelEmpty / WorkspacePanelSkeleton** — right-column contents in the three states.
+- **LifecycleControls** — the state-machine actions row. Takes an optional `onOpen` render prop that returns the running-state primary — the developer surface plugs `ConnectPopover` in.
+- **ConnectPopover** — Popover anchored on the Open button; renders the three connect methods (VS Code desktop / Open in browser / Copy SSH).
+- **WorkspaceActionsDropdown / WorkspaceActionsContext** — kebab and right-click wrappers around the shared `useWorkspaceActionsState` (Rename / Duplicate / Copy ID / Delete).
+- **useTransitionProgress** — hook that returns `secondsRemaining` / `almostDone`; backed by a module-level Map + 1s interval.
 - **TemplateCard** — used in flow 1; reused in the admin templates view.
-- **UsageCircle** — small SVG donut with threshold-colored fill, used on the developer card for compact resource indication. 36px diameter, 1.5px stroke, neutral / amber / red thresholds at 60% / 85%.
-- **WorkspaceActionsMenu** — shared menu used by the kebab `DropdownMenu` and the right-click `ContextMenu` wrapper on the card. Items: Rename, Duplicate, Copy ID, separator, Delete (destructive).
-
-## Flow 3 — Workspace actions
-
-Triggered from the kebab in the action group **or** by right-clicking anywhere on a workspace card. Same set of items either way:
-
-1. **Rename** → opens a dialog with the current name pre-filled. Submit calls `PATCH /api/workspaces/:id` with `{ name }`. Validation is slug-shape, 1–50 characters, letters / digits / hyphens. List + detail invalidate so the new name shows everywhere it's rendered.
-2. **Duplicate** → calls `POST /api/workspaces/:id/duplicate`. The mock backend clones the template + owner, autogenerates a Coder-style name, and returns a fresh workspace in `starting`. The client navigates to the duplicate's detail page so the user watches it come up.
-3. **Copy ID** → writes `workspace.id` to the clipboard and toasts "Workspace ID copied".
-4. **Delete** → existing typed-name confirmation modal. Destructive register; separated from the safe actions.
 
 ## States to handle
 
 For every data-driven surface:
-- Loading — skeleton, not spinner
-- Empty — only on the list (never on detail)
+- Loading — skeleton, not spinner (the panel has its own skeleton variant)
+- Empty — panel empty state when nothing is selected; page-level empty when the workspace list is empty
 - Error — data fetch failed; distinct from workspace-error status
-- Transitional — between stable statuses
+- Transitional — panel actions row shows the disabled countdown button
 
 ## Open questions
 
-- ~~Does cost appear on the list card, or only on detail?~~ **Resolved** — cost is not shown on the developer card. Cost is an admin concern; the developer surface shows session cost prominently on the detail header and demotes hourly cost to a row in the metadata grid (same register as Region / Created). Admin VM detail keeps both prominent.
+- Does cost appear on the compact card, or only in the panel? Current plan: panel only — cost is mostly an admin concern and would noisy up a 3-line card.
 - Does the developer ever see other people's workspaces? Default no; revisit if admin and developer roles share screens.
