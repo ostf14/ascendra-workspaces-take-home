@@ -119,7 +119,7 @@ export function AdminVMTable({
           </colgroup>
           <thead>
             <tr className="border-b border-border-default text-[13px] font-medium text-text-tertiary">
-              <th className="px-3 py-2.5 text-left">
+              <th className="px-3 py-2 text-left">
                 <Checkbox
                   checked={allSelected ? true : someSelected ? "indeterminate" : false}
                   onCheckedChange={(next) => onToggleAll(Boolean(next))}
@@ -130,7 +130,7 @@ export function AdminVMTable({
                 <th
                   key={col.key}
                   className={cn(
-                    "px-3 py-2.5",
+                    "px-3 py-2 whitespace-nowrap",
                     col.align === "right" ? "text-right" : "text-left"
                   )}
                   scope="col"
@@ -151,7 +151,7 @@ export function AdminVMTable({
                   </button>
                 </th>
               ))}
-              <th className="px-3 py-2.5" />
+              <th className="px-3 py-2 whitespace-nowrap" />
             </tr>
           </thead>
           <tbody>
@@ -163,13 +163,12 @@ export function AdminVMTable({
                   key={row.id}
                   data-selected={checked || undefined}
                   className={cn(
-                    "border-b border-border-subtle text-[13px] text-text-primary transition-colors",
+                    "h-9 border-b border-border-subtle text-[13px] leading-none text-text-primary transition-colors",
                     "hover:bg-surface-secondary",
                     checked && "bg-accent-coral/5"
                   )}
-                  style={{ height: "36px" }}
                 >
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <Checkbox
                       checked={checked}
                       onCheckedChange={(next) => onToggleRow(row.id, Boolean(next))}
@@ -184,8 +183,8 @@ export function AdminVMTable({
                       {row.name}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">
-                    <div className="flex flex-col leading-tight">
+                  <td className="px-3 py-2 whitespace-nowrap">
+                    <div className="flex items-baseline gap-1.5 leading-none">
                       <span className="truncate">{row.ownerName}</span>
                       <span className="truncate text-xs text-text-tertiary">
                         {row.ownerEmail}
@@ -193,7 +192,7 @@ export function AdminVMTable({
                     </div>
                   </td>
                   <td className="px-3 py-2 text-text-secondary">{row.templateName}</td>
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 whitespace-nowrap">
                     <StatusBadge status={row.status} />
                   </td>
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
@@ -217,7 +216,7 @@ export function AdminVMTable({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          size="sm"
+                          size="icon-xs"
                           variant="ghost"
                           aria-label={`Actions for ${row.name}`}
                         >
