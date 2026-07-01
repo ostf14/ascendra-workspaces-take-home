@@ -77,7 +77,7 @@ function StatsRow({ workspace }: { workspace: VM }) {
           <UsageCircle label="Memory" value={workspace.memory} size="md" />
           <UsageCircle label="Disk" value={workspace.disk} size="md" />
         </div>
-        <dl className="flex flex-1 flex-wrap items-baseline justify-center gap-10 rounded-md bg-surface-secondary px-6 py-6">
+        <dl className="flex flex-1 flex-wrap items-center justify-center gap-10 rounded-md bg-surface-secondary px-6 py-6">
           <StatField label="Uptime" value={formatUptime(workspace)} />
           <StatField
             label="Session cost"
