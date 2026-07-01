@@ -111,7 +111,7 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
     >
       <header className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
-          <h2 className="font-mono text-lg font-medium leading-tight text-text-primary">
+          <h2 className="min-w-0 flex-1 truncate font-mono text-lg font-medium leading-tight text-text-primary">
             {workspace.name}
           </h2>
           <StatusBadge status={workspace.status} />
@@ -121,6 +121,20 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
               className="text-xs"
             />
           ) : null}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                aria-label="Delete workspace"
+                onClick={() => setDeleteOpen(true)}
+                className="ml-auto text-status-error hover:bg-status-error/10 hover:text-status-error"
+              >
+                <Trash2 className="size-4" strokeWidth={1.5} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Delete workspace</TooltipContent>
+          </Tooltip>
         </div>
         <p className="text-sm text-text-tertiary">
           {workspace.templateName} · {workspace.region} · Provisioned{" "}
@@ -128,7 +142,7 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
         </p>
       </header>
 
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2">
         <Button
           size="sm"
           variant="outline"
@@ -154,20 +168,6 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
           <UserCog className="size-4" strokeWidth={1.5} />
           Reassign owner
         </Button>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              aria-label="Delete workspace"
-              onClick={() => setDeleteOpen(true)}
-              className="ml-auto text-status-error hover:bg-status-error/10 hover:text-status-error"
-            >
-              <Trash2 className="size-4" strokeWidth={1.5} />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Delete workspace</TooltipContent>
-        </Tooltip>
       </div>
 
       <OwnerRow ownerId={workspace.ownerId} />
@@ -184,7 +184,7 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
           value={formatCurrency(sessionCost(workspace))}
         />
         <CostField
-          label="Hourly cost"
+          label="Rate"
           value={`${formatCurrency(workspace.hourlyCost)}/hr`}
         />
       </dl>
