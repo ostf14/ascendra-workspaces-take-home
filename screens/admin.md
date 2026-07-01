@@ -21,7 +21,7 @@ Home page for the admin. First view after sign-in.
 
 Layout (top to bottom):
 
-1. **Waste insight card** — full-width, sticks to the top of the content area. Unchanged from decision 03: idle count, estimated monthly waste, primary action into the filtered inventory, positive empty state when zero idle.
+1. **Waste insight card** — full-width, sticks to the top of the content area. Two-line anomaly layout: line 1 states the finding in bold (`N idle workspaces wasting ~$X/month`) with an inline `Review →` text link to the filtered inventory; line 2 is a subtle explanatory sentence (`Stop them to recover the spend. Files and settings are preserved.`). No border, no leading icon square — just an `--accent-muted` background at `--radius-md`. The earlier iteration used a coral outline + alarm-clock icon + filled CTA button; that stack read as three signals for one message, so it was collapsed to a single tinted plate with an inline text link. Positive empty state when zero idle stays as-is (leaf icon + reassuring copy on a neutral elevated surface).
 2. **Split row** — two equal columns, 16px gap. Left column: two grouped metric cards stacked vertically (16px gap between them). Right column: aggregate utilization chart, `align-self: stretch` so it fills the left column's combined height.
 
 The six loose `HeroMetric` cards from the earlier iteration were regrouped into two semantic cards, because the six numbers belong to three different stories and grouping surfaces that. `HeroMetric` retired; `MetricGroupCard` replaces it.
@@ -123,7 +123,7 @@ This closes scenario 6 (onboarding). It's also the only path by which an `engine
 ## Component inventory (admin-specific)
 
 - **MetricGroupCard** — surface-secondary plate that hosts a row of related metrics (Cost this month, Fleet health) with a small section header, per-column labels + `--text-2xl` mono values + delta strip, thin vertical dividers between columns. Replaces the earlier single-metric `HeroMetric` primitive.
-- **WasteInsightCard** — full-width anomaly-style card with action; positive empty state when no waste
+- **WasteInsightCard** — full-width two-line anomaly plate (`--accent-muted` background, no border, no icon) with an inline `Review →` text link to the filtered inventory; positive empty state when no waste
 - **AdminVMTable** — dense table, sortable columns, row selection
 - **BulkActionBar** — appears on selection, sticky to top of table
 - **DistributionChart** — histogram of resource utilization across the fleet

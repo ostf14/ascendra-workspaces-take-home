@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Leaf, MoonStar } from "lucide-react";
+import { ArrowRight, Leaf } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AdminOverview } from "@/lib/domain/types";
 import { formatCurrency, formatNumber } from "@/lib/utils/format";
@@ -17,8 +16,11 @@ export function WasteInsightCard({
 }) {
   if (loading || !data) {
     return (
-      <section className="rounded-lg border border-border-default bg-surface-elevated p-6">
-        <Skeleton className="h-24 w-full" />
+      <section
+        className="rounded-md p-5"
+        style={{ background: "var(--accent-muted)" }}
+      >
+        <Skeleton className="h-14 w-full" />
       </section>
     );
   }
@@ -53,32 +55,26 @@ export function WasteInsightCard({
   return (
     <section
       aria-label="Fleet waste"
-      className="flex flex-wrap items-center justify-between gap-6 rounded-lg border border-accent-coral/40 bg-accent-coral/5 p-6"
+      className="flex flex-col gap-1.5 rounded-md p-5"
+      style={{ background: "var(--accent-muted)" }}
     >
-      <div className="flex items-start gap-4">
-        <span
-          className="inline-flex size-9 items-center justify-center rounded-md border border-accent-coral/40 bg-accent-coral/10"
+      <div className="flex flex-wrap items-baseline justify-between gap-4">
+        <p className="text-md font-medium text-text-primary">
+          {formatNumber(idleCount)} idle workspaces wasting ~
+          {formatCurrency(estimatedMonthlyWaste, { fractionDigits: 0 })}/month
+        </p>
+        <Link
+          href="/admin/workspaces?idleOnly=true"
+          className="inline-flex items-center gap-1 text-sm font-medium hover:underline"
           style={{ color: "var(--accent)" }}
         >
-          <MoonStar className="size-4" strokeWidth={1.5} />
-        </span>
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-md font-medium text-text-primary">
-            {formatNumber(idleCount)} idle workspaces, ~
-            {formatCurrency(estimatedMonthlyWaste, { fractionDigits: 0 })}/month
-            wasted
-          </h2>
-          <p className="text-sm text-text-secondary">
-            Stop them to recover the spend. Files and settings are preserved.
-          </p>
-        </div>
-      </div>
-      <Button asChild>
-        <Link href="/admin/workspaces?idleOnly=true">
-          Review idle workspaces
+          Review
           <ArrowRight className="size-4" strokeWidth={1.5} />
         </Link>
-      </Button>
+      </div>
+      <p className="text-sm text-text-tertiary">
+        Stop them to recover the spend. Files and settings are preserved.
+      </p>
     </section>
   );
 }
