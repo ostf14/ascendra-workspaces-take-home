@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -28,8 +27,7 @@ import { StatusBadge } from "@/components/workspace/status-badge";
 import { UsageCircle } from "@/components/workspace/usage-circle";
 import { useStopWorkspace } from "@/lib/hooks/use-workspace-lifecycle";
 import { useUsers } from "@/lib/hooks/use-users";
-import { useWorkspaces } from "@/lib/hooks/use-workspaces";
-import type { VM } from "@/lib/domain/types";
+import type { FleetInventoryItem, VM } from "@/lib/domain/types";
 import { formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
@@ -80,13 +78,12 @@ function deriveActivity(workspace: VM): ActivityEvent[] {
   return events.sort((a, b) => (a.at < b.at ? 1 : -1)).slice(0, 5);
 }
 
-export function AdminWorkspacePanel({ workspaceId }: { workspaceId: string | undefined }) {
-  const { data: workspaces } = useWorkspaces();
-  const workspace = workspaces?.find((w) => w.id === workspaceId);
-
-  if (!workspaceId) return <AdminPanelEmpty />;
-  if (!workspace) return <AdminPanelSkeleton />;
-
+export function AdminWorkspacePanel({
+  workspace,
+}: {
+  workspace: FleetInventoryItem | undefined;
+}) {
+  if (!workspace) return <AdminPanelEmpty />;
   return <AdminPanelBody workspace={workspace} />;
 }
 
@@ -332,16 +329,4 @@ export function AdminPanelEmpty() {
   );
 }
 
-export function AdminPanelSkeleton() {
-  return (
-    <section className="flex flex-col gap-4 rounded-lg border border-border-default bg-surface-elevated p-5">
-      <Skeleton className="h-6 w-56" />
-      <Skeleton className="h-4 w-72" />
-      <Skeleton className="h-9 w-full" />
-      <Skeleton className="h-16 w-full" />
-      <Skeleton className="h-24 w-full" />
-      <Skeleton className="h-14 w-full" />
-    </section>
-  );
-}
 
