@@ -44,7 +44,7 @@ Right-click any compact card opens a context menu with **Rename / Duplicate / Co
 
 Layout top to bottom (no section titles inside, apart from the collapsible logs):
 
-**Panel header.** Two-column layout. Left: workspace name (mono, `--text-2xl`, weight 500), status pill inline, idle text modifier ("· Idle 38h" in `--status-idle`) if applicable. Right: `LifecycleControls` (Primary + Sec 1 + Sec 2 + kebab per state machine). Vertically centered against the name row.
+**Panel header.** Two-column layout. Left: workspace name (mono, `--text-lg` — 24px in this scale, weight 500, tight line-height), status pill inline, idle text modifier ("· Idle 38h" in `--status-idle`) if applicable. The title sits at 24px so it reads as a companion to the 22px status pill rather than dwarfing it. Right: `LifecycleControls` (state machine layout per below). Vertically centered against the name row.
 
 **Sub-header.** Directly below the header row: `templateName · region · Provisioned MMM d, yyyy`, all in `--text-sm`, `--text-tertiary`.
 

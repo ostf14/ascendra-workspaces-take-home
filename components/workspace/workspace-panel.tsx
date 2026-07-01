@@ -34,7 +34,7 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
       <header className="flex flex-col gap-1">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
           <div className="flex flex-wrap items-center gap-3">
-            <h1 className="font-mono text-2xl font-medium text-text-primary">
+            <h1 className="font-mono text-lg font-medium leading-tight text-text-primary">
               {workspace.name}
             </h1>
             <StatusBadge status={workspace.status} />
