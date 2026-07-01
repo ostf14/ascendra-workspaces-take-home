@@ -73,15 +73,15 @@ function StatsRow({ workspace }: { workspace: VM }) {
     <div
       role="group"
       aria-label="Workspace stats"
-      className="@container/stats"
+      className="@container/stats rounded-md bg-surface-secondary px-6 py-5"
     >
-      <div className="flex flex-wrap items-center gap-x-16 gap-y-6 rounded-md bg-surface-secondary px-6 py-5 @max-[880px]/stats:flex-col @max-[880px]/stats:items-start">
+      <div className="flex flex-wrap items-center justify-center gap-14 @max-[880px]/stats:flex-col">
         <div className="flex items-center gap-8">
           <UsageCircle label="CPU" value={workspace.cpu} size="md" />
           <UsageCircle label="Memory" value={workspace.memory} size="md" />
           <UsageCircle label="Disk" value={workspace.disk} size="md" />
         </div>
-        <dl className="flex flex-wrap items-baseline gap-x-10 gap-y-4">
+        <dl className="flex flex-wrap items-baseline gap-10">
           <StatField label="Uptime" value={formatUptime(workspace)} />
           <StatField
             label="Session cost"

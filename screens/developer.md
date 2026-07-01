@@ -52,7 +52,7 @@ Layout top to bottom (no section titles inside, apart from the collapsible logs)
 - Left: three `UsageCircle` components at `size="md"` (56px) for CPU / Memory / Disk, with labels below each circle.
 - Right: three text metrics (Uptime / Session cost / Hourly cost) — labels above, values below. Every value is `--text-base`, JetBrains Mono, weight 500, `--text-primary`. No hero; the block reads as three equivalent metric slots. Labels stay `--text-xs`, `--text-tertiary`, weight 400. Uptime reads "—" when the workspace is stopped.
 
-The stats row sits inside a subtle container (`--surface-secondary`, `--radius-md`, 24px padding). At panel widths below ~880px it wraps to stack the circles above the text block via a container query — the layout doesn't rely on viewport width because the 320px sidebar reshapes the panel independently.
+The stats row sits inside a subtle container (`--surface-secondary`, `--radius-md`, 24px padding). Circles block and text-metrics block live inside a single centered flexbox (`justify-content: center`, ~56px gap between them) — the group sits in the middle of the container rather than stretching to the edges. At panel widths below ~880px the flex wraps to stack the two blocks vertically, both still centered, via a container query — the layout doesn't rely on viewport width because the 320px sidebar reshapes the panel independently.
 
 **Metrics charts.** Two-column grid — CPU on the left, Memory on the right. Range toggle (1h / 24h) sits in the section's own header (unchanged from before).
 
