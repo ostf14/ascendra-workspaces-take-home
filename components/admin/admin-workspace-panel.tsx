@@ -1,6 +1,6 @@
 "use client";
 
-import { format, formatDistanceToNowStrict, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import {
   MousePointerClick,
   OctagonX,
@@ -28,7 +28,7 @@ import { UsageCircle } from "@/components/workspace/usage-circle";
 import { useStopWorkspace } from "@/lib/hooks/use-workspace-lifecycle";
 import { useUsers } from "@/lib/hooks/use-users";
 import type { FleetInventoryItem, VM } from "@/lib/domain/types";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCompactRelative, formatCurrency } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 function sessionCost(workspace: VM): number {
@@ -253,7 +253,7 @@ function RecentActivity({ events }: { events: ActivityEvent[] }) {
               ) : null}
             </span>
             <span className="font-mono text-text-tertiary tabular-nums">
-              {formatDistanceToNowStrict(parseISO(event.at), { addSuffix: true })}
+              {formatCompactRelative(event.at)}
             </span>
           </li>
         ))}

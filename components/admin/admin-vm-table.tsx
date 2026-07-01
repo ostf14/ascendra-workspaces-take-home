@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { formatDistanceToNow, parseISO } from "date-fns";
 import { ArrowDown, ArrowUp, ArrowUpDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ import type {
   FleetSortKey,
   SortOrder,
 } from "@/lib/domain/types";
-import { formatPercent } from "@/lib/utils/format";
+import { formatCompactRelative, formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 type Column = {
@@ -48,7 +47,7 @@ function compareValues(
     case "name":
       return a.name.localeCompare(b.name);
     case "owner":
-      return a.ownerName.localeCompare(b.ownerName);
+      return a.ownerEmail.localeCompare(b.ownerEmail);
     case "template":
       return a.templateName.localeCompare(b.templateName);
     case "status":
@@ -108,14 +107,14 @@ export function AdminVMTable({
         <table className="w-full min-w-[840px] table-fixed border-collapse text-sm">
           <colgroup>
             <col className="w-[36px]" />
-            <col className="w-[20%]" />
-            <col className="w-[18%]" />
-            <col className="w-[13%]" />
+            <col className="w-[24%]" />
+            <col className="w-[16%]" />
+            <col className="w-[17%]" />
             <col className="w-[8%]" />
             <col className="w-[7%]" />
             <col className="w-[7%]" />
             <col className="w-[7%]" />
-            <col className="w-[13%]" />
+            <col className="w-[9%]" />
             <col className="w-[44px]" />
           </colgroup>
           <thead>
@@ -191,13 +190,8 @@ export function AdminVMTable({
                   <td className="px-3 py-2 font-mono">
                     <span className="block truncate">{row.name}</span>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap">
-                    <div className="flex items-baseline gap-1.5 leading-none">
-                      <span className="truncate">{row.ownerName}</span>
-                      <span className="truncate text-xs text-text-tertiary">
-                        {row.ownerEmail}
-                      </span>
-                    </div>
+                  <td className="px-3 py-2 whitespace-nowrap font-mono text-text-secondary">
+                    <span className="block truncate">{row.ownerEmail}</span>
                   </td>
                   <td className="px-3 py-2 text-text-secondary">{row.templateName}</td>
                   <td className="px-3 py-2 whitespace-nowrap">
@@ -212,10 +206,8 @@ export function AdminVMTable({
                   <td className="px-3 py-2 text-right font-mono tabular-nums">
                     {formatPercent(row.disk)}
                   </td>
-                  <td className="px-3 py-2 text-right text-text-secondary">
-                    {formatDistanceToNow(parseISO(row.lastActiveAt), {
-                      addSuffix: true,
-                    })}
+                  <td className="px-3 py-2 text-right font-mono tabular-nums text-text-secondary">
+                    {formatCompactRelative(row.lastActiveAt)}
                   </td>
                   <td
                     className="px-3 py-2 text-right"

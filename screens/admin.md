@@ -52,7 +52,9 @@ The admin's workhorse. Master-detail layout — table on the left (2/3), workspa
 - Bulk-action bar — appears on row selection, sticky to top (Stop / Restart / Delete)
 
 **Table (left 2/3):**
-- Columns: checkbox · Name · Owner (name + email inline) · Template · Status · CPU · RAM · Disk · Last active · kebab
+- Columns: checkbox · Name · Owner (email only, mono, `--text-secondary`) · Template · Status · CPU · RAM · Disk · Last active (compact, mono, right-aligned) · kebab
+- Owner name was dropped from the row after the master-detail layout landed. The right panel already surfaces the owner's name + email, so repeating both in every row was doubling the vertical noise for no extra information at the row level. Sort-by-owner now compares by email string.
+- Last-active values use the shared `formatCompactRelative` (`now` / `Nm` / `Nh` / `Nd` / `Nw` / `>1mo`). date-fns's verbose `"about 3 hours ago"` broke column alignment and wrapped on narrow viewports. Mono + tabular-nums keeps the column vertically aligned.
 - Hourly cost is NOT a column — it moved into the right panel where it sits next to the derived Session cost.
 - Sortable on every column. Default sort: status, then hourly cost descending.
 - Row-click selects the workspace and updates the URL to `?w=<vm-id>` — no route change. Selected row: subtle `--accent-muted` background + 2px left inset accent border. Checkbox and kebab cells stop propagation so those still open menus / toggle selection rather than swapping the panel.

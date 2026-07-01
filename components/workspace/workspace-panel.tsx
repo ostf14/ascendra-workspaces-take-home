@@ -1,6 +1,6 @@
 "use client";
 
-import { format, formatDistanceToNowStrict, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 import { LayoutGrid } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,11 +12,11 @@ import { UsageCircle } from "@/components/workspace/usage-circle";
 import { WorkspaceLogs } from "@/components/workspace/workspace-logs";
 import { WorkspaceMetricsChart } from "@/components/workspace/workspace-metrics-chart";
 import type { VM } from "@/lib/domain/types";
-import { formatCurrency } from "@/lib/utils/format";
+import { formatCompactRelative, formatCurrency } from "@/lib/utils/format";
 
 function formatUptime(workspace: VM): string {
   if (workspace.status !== "running") return "—";
-  return formatDistanceToNowStrict(parseISO(workspace.createdAt));
+  return formatCompactRelative(workspace.createdAt);
 }
 
 function sessionCost(workspace: VM): number {
