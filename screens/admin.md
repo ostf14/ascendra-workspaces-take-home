@@ -71,7 +71,9 @@ Top to bottom:
 
 Selection state uses the same state-as-truth + `history.replaceState` mirror pattern as the developer surface (see screens/developer.md) — rapid row-clicks won't drop panel updates via Next.js router coalescing.
 
-Below ~1200px viewport width, the grid collapses to a single column: table on top, panel below.
+**Sticky panel:** the right column is `position: sticky` with `top: 112px` (top-nav 56px + admin sub-nav 44px + 12px breathing room) and `max-height: calc(100vh - 136px)` with internal overflow-y. As the admin scrolls through a long inventory table, the selected workspace's detail panel stays pinned within the viewport; the panel's internal content scrolls if it exceeds the available height. Filter row and page header are not sticky.
+
+Below ~1200px viewport width, the grid collapses to a single column: table on top, panel below. The sticky positioning has no effect in single-column mode because the panel sits below the table in normal flow.
 
 ## Screen 3 — Fleet Utilization (`/admin/utilization`)
 

@@ -246,11 +246,13 @@ export default function AdminWorkspacesPage() {
               activeId={activeId}
               onSelectRow={onSelectRow}
             />
-            <AdminWorkspacePanel
-              workspace={
-                activeId ? rows.find((r) => r.id === activeId) : undefined
-              }
-            />
+            <div className="sticky top-[112px] max-h-[calc(100vh-136px)] overflow-y-auto">
+              <AdminWorkspacePanel
+                workspace={
+                  activeId ? rows.find((r) => r.id === activeId) : undefined
+                }
+              />
+            </div>
           </div>
         </div>
       )}
