@@ -4,7 +4,7 @@ import { format, formatDistanceToNowStrict, parseISO } from "date-fns";
 import { LayoutGrid } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { ConnectPanel } from "@/components/workspace/connect-panel";
+import { ConnectPopover } from "@/components/workspace/connect-popover";
 import { IdlePill } from "@/components/workspace/idle-pill";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StatusBadge } from "@/components/workspace/status-badge";
@@ -47,7 +47,10 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
         </p>
       </header>
 
-      <LifecycleControls workspace={workspace} />
+      <LifecycleControls
+        workspace={workspace}
+        onOpen={() => <ConnectPopover workspace={workspace} />}
+      />
 
       <MetadataStrip workspace={workspace} />
 
@@ -60,8 +63,6 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
         <UsageCircle label="Memory" value={workspace.memory} size={56} />
         <UsageCircle label="Disk" value={workspace.disk} size={56} />
       </div>
-
-      <ConnectPanel workspace={workspace} />
 
       <WorkspaceMetricsChart id={workspace.id} />
 

@@ -7,7 +7,6 @@ import {
   MoreHorizontal,
   Play,
   RotateCcw,
-  SquareArrowOutUpRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -55,7 +54,7 @@ export function LifecycleControls({
   workspace: VM;
   variant?: "detail" | "card";
   redirectAfterDelete?: boolean;
-  onOpen?: () => void;
+  onOpen?: () => ReactNode;
 }) {
   const [recreateOpen, setRecreateOpen] = useState(false);
 
@@ -82,17 +81,7 @@ export function LifecycleControls({
   return (
     <div className="flex items-center gap-2">
       {/* Primary slot */}
-      {status === "running" && onOpen ? (
-        <Button
-          size={buttonSize}
-          variant="default"
-          onClick={onOpen}
-          aria-label={`Open ${workspace.name}`}
-        >
-          <SquareArrowOutUpRight className="size-4" strokeWidth={1.5} />
-          Open
-        </Button>
-      ) : null}
+      {status === "running" && onOpen ? onOpen() : null}
 
       {status === "stopped" ? (
         <HintButton
