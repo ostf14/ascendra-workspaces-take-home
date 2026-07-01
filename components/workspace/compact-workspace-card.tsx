@@ -14,13 +14,16 @@ export function CompactWorkspaceCard({
 }: {
   workspace: VM;
   selected: boolean;
-  onSelect: () => void;
+  onSelect: (id: string) => void;
 }) {
+  const workspaceId = workspace.id;
+  const handleClick = () => onSelect(workspaceId);
+
   return (
     <WorkspaceActionsContext workspace={workspace}>
       <button
         type="button"
-        onClick={onSelect}
+        onClick={handleClick}
         aria-pressed={selected}
         className={cn(
           "flex w-full flex-col gap-1.5 rounded-md border px-3.5 py-3 text-left transition-colors",

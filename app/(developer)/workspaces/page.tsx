@@ -76,7 +76,7 @@ export default function WorkspacesPage() {
                   key={workspace.id}
                   workspace={workspace}
                   selected={selected?.id === workspace.id}
-                  onSelect={() => selectWorkspace(workspace.id)}
+                  onSelect={selectWorkspace}
                 />
               ))}
         </div>
