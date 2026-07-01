@@ -1,6 +1,6 @@
 "use client";
 
-import { IdlePill } from "@/components/workspace/idle-pill";
+import { IdleIndicator } from "@/components/workspace/idle-pill";
 import { StatusBadge } from "@/components/workspace/status-badge";
 import { UsageCircle } from "@/components/workspace/usage-circle";
 import { WorkspaceActionsContext } from "@/components/workspace/workspace-actions-menu";
@@ -39,7 +39,7 @@ export function CompactWorkspaceCard({
         <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-text-tertiary">
           <span className="truncate">{workspace.templateName}</span>
           {workspace.isIdle ? (
-            <IdlePill lastActiveAt={workspace.lastActiveAt} />
+            <IdleIndicator lastActiveAt={workspace.lastActiveAt} />
           ) : null}
         </div>
         <div className="mt-1 flex items-center gap-2">

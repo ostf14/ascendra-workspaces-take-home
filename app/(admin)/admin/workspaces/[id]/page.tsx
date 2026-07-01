@@ -11,7 +11,7 @@ import { ConnectPanel } from "@/components/workspace/connect-panel";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StartingProgress } from "@/components/workspace/starting-progress";
 import { StatusBadge } from "@/components/workspace/status-badge";
-import { WorkspaceIdleHint } from "@/components/workspace/workspace-idle-hint";
+import { IdleIndicator } from "@/components/workspace/idle-pill";
 import { WorkspaceLogs } from "@/components/workspace/workspace-logs";
 import { WorkspaceMetadata } from "@/components/workspace/workspace-metadata";
 import { WorkspaceMetricsChart } from "@/components/workspace/workspace-metrics-chart";
@@ -47,6 +47,12 @@ export default function AdminWorkspaceDetailPage({
               <h1 className="font-mono text-2xl font-medium text-text-primary">{data.name}</h1>
               <div className="flex items-center gap-3">
                 <StatusBadge status={data.status} />
+                {data.isIdle ? (
+                  <IdleIndicator
+                    lastActiveAt={data.lastActiveAt}
+                    className="text-xs"
+                  />
+                ) : null}
                 <span className="text-xs text-text-tertiary">
                   {data.templateName}
                 </span>
@@ -55,7 +61,6 @@ export default function AdminWorkspaceDetailPage({
             <LifecycleControls workspace={data} redirectAfterDelete />
           </header>
 
-          <WorkspaceIdleHint workspace={data} />
           <StartingProgress workspace={data} />
 
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-[2fr_1fr]">

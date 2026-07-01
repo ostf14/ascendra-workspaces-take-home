@@ -1,10 +1,11 @@
 "use client";
 
-import { Moon } from "lucide-react";
 import { parseISO } from "date-fns";
 
-// Compact relative time formatter — keeps the pill short ("38h", "1d", "7d").
-// date-fns formatDistanceToNow is too verbose for a card affordance.
+import { cn } from "@/lib/utils";
+
+// Compact relative time formatter — keeps the label short ("38h", "1d", "7d").
+// date-fns formatDistanceToNow is too verbose for a status-line modifier.
 function compactSince(date: Date): string {
   const ms = Math.max(0, Date.now() - date.getTime());
   const minutes = Math.floor(ms / 60_000);
@@ -17,22 +18,24 @@ function compactSince(date: Date): string {
   return `${weeks}w`;
 }
 
-export function IdlePill({ lastActiveAt }: { lastActiveAt: string }) {
+// Idle is not a status — a running-but-quiet workspace is still running.
+// Treat it as an inline text modifier next to the status pill, not a pill of
+// its own. No background, no border, no icon.
+export function IdleIndicator({
+  lastActiveAt,
+  className,
+}: {
+  lastActiveAt: string;
+  className?: string;
+}) {
   const since = compactSince(parseISO(lastActiveAt));
-  const color = "var(--status-idle)";
-
   return (
     <span
       aria-label={`Idle for ${since}`}
-      className="inline-flex h-[18px] w-fit items-center gap-1 rounded-sm border px-1.5 text-[11px] font-medium leading-none"
-      style={{
-        color,
-        backgroundColor: `color-mix(in oklab, ${color} 10%, transparent)`,
-        borderColor: `color-mix(in oklab, ${color} 25%, transparent)`,
-      }}
+      className={cn("whitespace-nowrap", className)}
+      style={{ color: "var(--status-idle)" }}
     >
-      <Moon className="size-2.5" strokeWidth={1.5} />
-      Idle · {since}
+      · Idle {since}
     </span>
   );
 }

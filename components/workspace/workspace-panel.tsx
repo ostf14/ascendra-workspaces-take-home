@@ -5,7 +5,7 @@ import { LayoutGrid } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConnectPopover } from "@/components/workspace/connect-popover";
-import { IdlePill } from "@/components/workspace/idle-pill";
+import { IdleIndicator } from "@/components/workspace/idle-pill";
 import { LifecycleControls } from "@/components/workspace/lifecycle-controls";
 import { StatusBadge } from "@/components/workspace/status-badge";
 import { UsageCircle } from "@/components/workspace/usage-circle";
@@ -38,7 +38,10 @@ export function WorkspacePanel({ workspace }: { workspace: VM }) {
           </h1>
           <StatusBadge status={workspace.status} />
           {workspace.isIdle ? (
-            <IdlePill lastActiveAt={workspace.lastActiveAt} />
+            <IdleIndicator
+              lastActiveAt={workspace.lastActiveAt}
+              className="text-sm"
+            />
           ) : null}
         </div>
         <p className="text-sm text-text-tertiary">
