@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { Providers } from "@/app/providers";
+import { MetaBar } from "@/components/layout/meta-bar";
 import { TopNav } from "@/components/layout/top-nav";
 
 const spaceGrotesk = Space_Grotesk({
@@ -37,6 +38,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-background text-foreground font-sans">
         <Providers>
+          <MetaBar />
           <TopNav />
           <main className="flex-1 flex flex-col">{children}</main>
         </Providers>

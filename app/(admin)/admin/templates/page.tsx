@@ -94,7 +94,7 @@ export default function AdminTemplatesPage() {
               />
             ))}
           </div>
-          <div className="sticky top-[112px] max-h-[calc(100vh-136px)] overflow-x-hidden overflow-y-auto">
+          <div className="sticky top-[144px] max-h-[calc(100vh-168px)] overflow-x-hidden overflow-y-auto">
             <AdminTemplatePanel template={selected} />
           </div>
         </div>

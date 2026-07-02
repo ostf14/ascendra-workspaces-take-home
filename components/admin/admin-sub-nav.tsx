@@ -35,7 +35,7 @@ export function AdminSubNav() {
   return (
     <nav
       aria-label="Admin sections"
-      className="sticky top-14 z-30 border-b border-border-subtle bg-surface-page/85 backdrop-blur supports-[backdrop-filter]:bg-surface-page/75"
+      className="sticky top-[88px] z-30 border-b border-border-subtle bg-surface-page/85 backdrop-blur supports-[backdrop-filter]:bg-surface-page/75"
     >
       <ul className="mx-auto flex w-full max-w-[1440px] items-center gap-1 px-6">
         {LINKS.map((link) => {

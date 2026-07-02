@@ -6,30 +6,31 @@ import { Settings2, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-type Mode = "developer" | "admin";
+type Mode = "engineer" | "admin";
 
 const STORAGE_KEY: Record<Mode, string> = {
-  developer: "ascendra:last-path:developer",
+  engineer: "ascendra:last-path:engineer",
   admin: "ascendra:last-path:admin",
 };
 
 const FALLBACK: Record<Mode, string> = {
-  developer: "/workspaces",
+  engineer: "/workspaces",
   admin: "/admin",
 };
 
 function activeModeFromPath(pathname: string): Mode {
-  return pathname.startsWith("/admin") ? "admin" : "developer";
+  return pathname.startsWith("/admin") ? "admin" : "engineer";
 }
 
-// The persona switcher is a mode toggle, not tab navigation. Two surfaces
-// answer to different audiences (developer / admin) — the segmented control
-// makes that split visible instead of implying they're peer sections.
+// Persona switcher — a viewer-perspective control, not tab navigation.
+// Lives in the meta bar above the product chrome. Order is engineer-then-
+// admin because engineer is the base persona (every user has engineer
+// access; admin is elevated).
 //
 // Persistence: the last URL visited within each mode (including its search
 // params — the master-detail selection lives there) is written to
-// localStorage on every navigation. Switching to another mode and back
-// lands the user where they left off, not on the mode's landing page.
+// localStorage on every navigation. Switching to the other persona and
+// back lands the user where they left off, not on the mode's landing page.
 export function PersonaSwitcher() {
   const router = useRouter();
   const pathname = usePathname() ?? "/";
@@ -46,7 +47,7 @@ export function PersonaSwitcher() {
       if (pathname.startsWith("/admin")) {
         window.localStorage.setItem(STORAGE_KEY.admin, url);
       } else if (pathname.startsWith("/workspaces")) {
-        window.localStorage.setItem(STORAGE_KEY.developer, url);
+        window.localStorage.setItem(STORAGE_KEY.engineer, url);
       }
     } catch {
       // Storage disabled — fall back to the mode's landing page on switch.
@@ -73,18 +74,18 @@ export function PersonaSwitcher() {
     <div
       role="tablist"
       aria-label="Persona"
-      className="inline-flex items-center gap-1 rounded-md bg-surface-secondary p-1"
+      className="inline-flex items-center gap-0.5 rounded-md bg-surface-secondary p-0.5"
     >
       <SegmentButton
-        active={active === "developer"}
-        onClick={() => goToMode("developer")}
-        icon={<UserRound className="size-3.5" strokeWidth={1.5} />}
-        label="My workspaces"
+        active={active === "engineer"}
+        onClick={() => goToMode("engineer")}
+        icon={<UserRound className="size-3" strokeWidth={1.5} />}
+        label="Engineer"
       />
       <SegmentButton
         active={active === "admin"}
         onClick={() => goToMode("admin")}
-        icon={<Settings2 className="size-3.5" strokeWidth={1.5} />}
+        icon={<Settings2 className="size-3" strokeWidth={1.5} />}
         label="Admin"
       />
     </div>
@@ -110,7 +111,7 @@ function SegmentButton({
       type="button"
       onClick={onClick}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-sm font-medium transition-colors",
+        "inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[11px] font-medium leading-none transition-colors",
         active
           ? "bg-surface-elevated text-text-primary shadow-[0_1px_2px_rgba(15,15,17,0.06)]"
           : "text-text-tertiary hover:text-text-primary"
