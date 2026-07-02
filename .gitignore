@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# broader log catch (npm/yarn/pnpm-specific entries are above)
+*.log
+
+# editor state
+.idea/
+.vscode/
