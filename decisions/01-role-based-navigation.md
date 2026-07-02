@@ -33,9 +33,10 @@ This keeps the IA flat, removes a redundant control, and respects the reality th
 ## Implementation notes
 
 - Routes split into two groups: `/workspaces/*` (developer surface) and `/admin/*` (fleet, templates, policies, users).
-- Top nav renders conditionally based on `currentUser.role`. Engineers see one entry; admins see two.
-- Direct navigation to `/admin/*` by an engineer returns 403 — not a redirect, because the route shouldn't appear to exist for them.
-- No role state is stored client-side beyond what the auth response provides. No "current view" toggle.
+- Top nav renders a persona segmented control (visible only for users with multiple roles) that reads as a major mode switch, not tab navigation. Persists last-visited URL per mode for continuity — an admin scrolling `/admin/utilization` who flips to My workspaces and back returns to `/admin/utilization`, not `/admin`.
+- The switcher swapped in for the earlier design of two persistent `Link` elements. The links read as peer sections of one site; the segmented control reads as "which audience am I right now" — closer to the reality that admins and developers are different mental modes over one platform, even when the same person carries both hats.
+- Direct navigation to `/admin/*` by an engineer is caught in the `(admin)` group layout and redirected to `/workspaces`. This diverges from the original "should return 403" note — reviewers and demo users landing on the wrong URL benefit from a soft handoff to a working surface more than a hard wall, and the guard sits at the layout level so every admin route inherits it without duplication.
+- No role state is stored client-side beyond what the auth response provides. The switcher's per-mode last-path memory lives in `localStorage` (`ascendra:last-path:developer` / `ascendra:last-path:admin`), separate from role.
 
 ## What this rules out
 
