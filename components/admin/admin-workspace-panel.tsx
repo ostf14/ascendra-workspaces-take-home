@@ -178,7 +178,10 @@ function AdminPanelBody({ workspace }: { workspace: VM }) {
         <UsageCircle label="Disk" value={workspace.disk} size="md" />
       </div>
 
-      <dl className="flex flex-wrap items-center justify-around gap-6 rounded-md bg-surface-secondary px-5 py-4">
+      <dl
+        data-note="session-cost-strip"
+        className="flex flex-wrap items-center justify-around gap-6 rounded-md bg-surface-secondary px-5 py-4"
+      >
         <CostField
           label="Session cost"
           value={formatCurrency(sessionCost(workspace))}

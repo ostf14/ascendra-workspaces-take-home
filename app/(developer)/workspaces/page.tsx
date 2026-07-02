@@ -81,12 +81,10 @@ export default function WorkspacesPage() {
   }
 
   return (
-    <div
-      className="mx-auto flex w-full max-w-[1440px] gap-6 px-6 py-6"
-      data-note="master-detail"
-    >
+    <div className="mx-auto flex w-full max-w-[1440px] gap-6 px-6 py-6">
       <aside
         aria-label="Workspaces"
+        data-note="master-detail-dev"
         className="flex w-[320px] shrink-0 flex-col gap-2"
       >
         <header className="flex items-center justify-between border-b border-border-subtle px-3.5 py-3">

@@ -21,7 +21,7 @@ The rejected alternative was showing all pins to everyone, with a "switch person
 Each element in the product tree that the overlay annotates carries a `data-note="<id>"` attribute. Example:
 
 ```tsx
-<section aria-label="Fleet waste" data-note="waste-card" ...>
+<section aria-label="Fleet waste" data-note="waste-primacy" ...>
 ```
 
 The overlay component (`components/layout/design-notes-overlay.tsx`) walks the catalog on every animation frame while the toggle is on, calls `document.querySelector('[data-note="<id>"]')` for each entry, and renders a pin at the anchor's top-right corner. Anchors that don't exist on the current route simply don't render — a note's number stays stable across routes, matching how a book's footnote numbering works.

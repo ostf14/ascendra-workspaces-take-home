@@ -17,7 +17,7 @@ export function IdleIndicator({
   return (
     <span
       aria-label={`Idle for ${since}`}
-      data-note="idle-indicator"
+      data-note="idle-text-modifier"
       className={cn("whitespace-nowrap", className)}
       style={{ color: "var(--status-idle)" }}
     >
