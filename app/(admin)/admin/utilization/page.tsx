@@ -31,24 +31,14 @@ export default function AdminUtilizationPage() {
       </header>
 
       {/*
-        The chart card lives inside a definite-height wrapper so the
-        recharts ResponsiveContainer (height="100%") has a real parent
-        height to resolve against. Without it the section only carries
-        min-height, which CSS percentage heights don't resolve to, and
-        the SVG paints at zero height. On /admin the sibling grid cell
-        supplies that definite height via items-stretch — here we have
-        no sibling, so we supply the height directly.
+        Hierarchy is inverted from the earlier iteration: the two
+        actionable charts (distribution + cost by template) sit at the
+        top, and the 24h aggregate is compressed to a context ribbon
+        below. The aggregate line is a self-evident daily pattern with
+        little new information; the buckets and the cost breakdown are
+        where the admin actually acts.
       */}
-      <div key={range} className="h-[320px] animate-fade-in">
-        <AdminOverviewChart
-          series={data ? { cpu: data.cpu, memory: data.memory } : undefined}
-          loading={isPending}
-          rangeLabel={range}
-          rangeControl={<RangeTabs value={range} onChange={setRange} />}
-        />
-      </div>
-
-      <div key={`${range}-bottom`} className="grid animate-fade-in grid-cols-1 gap-5 lg:grid-cols-2">
+      <div key={`${range}-top`} className="grid animate-fade-in grid-cols-1 gap-4 lg:grid-cols-2">
         {isPending || !data ? (
           <>
             <Skeleton className="h-72 w-full" />
@@ -60,6 +50,22 @@ export default function AdminUtilizationPage() {
             <CostByTemplateCard rows={data.costByTemplate} />
           </>
         )}
+      </div>
+
+      {/*
+        Fixed-height wrapper so recharts' ResponsiveContainer can
+        resolve height: 100% against a definite parent. The compact
+        prop strips the chart's own min-height floors so the ~200px
+        ribbon actually fits.
+      */}
+      <div key={range} className="h-[200px] animate-fade-in">
+        <AdminOverviewChart
+          series={data ? { cpu: data.cpu, memory: data.memory } : undefined}
+          loading={isPending}
+          rangeLabel={range}
+          rangeControl={<RangeTabs value={range} onChange={setRange} />}
+          compact
+        />
       </div>
     </section>
   );

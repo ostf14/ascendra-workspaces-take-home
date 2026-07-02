@@ -40,16 +40,24 @@ export function AdminOverviewChart({
   loading = false,
   rangeLabel = "24h",
   rangeControl,
+  compact = false,
 }: {
   series?: Series;
   loading?: boolean;
   rangeLabel?: string;
   rangeControl?: ReactNode;
+  compact?: boolean;
 }) {
+  const shellHeight = compact ? "h-full" : "flex h-full min-h-[280px]";
+  const bodyMin = compact ? "" : "min-h-64";
   if (loading || !series) {
     return (
-      <section className="flex h-full min-h-[280px] flex-col rounded-md bg-surface-secondary p-5">
-        <Skeleton className="h-full min-h-[220px] w-full" />
+      <section
+        className={`${compact ? "h-full" : "flex h-full min-h-[280px]"} flex-col rounded-md bg-surface-secondary p-5`}
+      >
+        <Skeleton
+          className={compact ? "h-full w-full" : "h-full min-h-[220px] w-full"}
+        />
       </section>
     );
   }
@@ -59,7 +67,7 @@ export function AdminOverviewChart({
   return (
     <section
       aria-label={`Aggregate utilization, last ${rangeLabel}`}
-      className="flex h-full min-h-[280px] flex-col rounded-md bg-surface-secondary"
+      className={`${shellHeight} flex flex-col rounded-md bg-surface-secondary`}
     >
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 pt-4 pb-3">
         <h2 className="text-sm font-medium text-text-primary">
@@ -87,7 +95,7 @@ export function AdminOverviewChart({
           {rangeControl}
         </div>
       </header>
-      <div className="min-h-64 flex-1 px-5 pb-4">
+      <div className={`${bodyMin} flex-1 px-5 pb-4`}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
             <defs>
