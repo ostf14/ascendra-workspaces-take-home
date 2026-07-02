@@ -88,6 +88,7 @@ export function DistributionChart({ buckets }: { buckets: UtilizationBucket[] })
   return (
     <section
       aria-label="CPU distribution across running workspaces"
+      data-note="cpu-distribution"
       className="flex flex-col rounded-lg border border-border-default bg-surface-elevated"
     >
       <header className="flex items-center justify-between gap-3 border-b border-border-subtle px-5 py-3.5">

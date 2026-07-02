@@ -27,6 +27,7 @@ export function TopNav() {
         >
           <span
             aria-hidden
+            data-note="palette"
             className="inline-block size-2 rounded-full bg-accent"
           />
           <span>Ascendra</span>

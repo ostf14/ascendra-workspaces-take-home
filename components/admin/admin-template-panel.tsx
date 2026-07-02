@@ -118,6 +118,7 @@ function TemplateView({
                   size="icon-sm"
                   variant="ghost"
                   aria-label="Edit template"
+                  data-note="templates-edit"
                   onClick={onEdit}
                   className="text-text-secondary hover:text-text-primary"
                 >

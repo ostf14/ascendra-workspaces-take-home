@@ -55,6 +55,7 @@ export function WasteInsightCard({
   return (
     <section
       aria-label="Fleet waste"
+      data-note="waste-card"
       className="flex flex-col gap-1.5 rounded-md p-5"
       style={{ background: "var(--accent-muted)" }}
     >

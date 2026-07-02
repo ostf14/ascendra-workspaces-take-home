@@ -3,6 +3,7 @@ import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 import { Providers } from "@/app/providers";
+import { DesignNotesOverlay } from "@/components/layout/design-notes-overlay";
 import { MetaBar } from "@/components/layout/meta-bar";
 import { TopNav } from "@/components/layout/top-nav";
 
@@ -41,6 +42,7 @@ export default function RootLayout({
           <MetaBar />
           <TopNav />
           <main className="flex-1 flex flex-col">{children}</main>
+          <DesignNotesOverlay />
         </Providers>
       </body>
     </html>

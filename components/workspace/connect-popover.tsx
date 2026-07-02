@@ -41,7 +41,11 @@ export function ConnectPopover({ workspace }: { workspace: VM }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button aria-haspopup="dialog" aria-label={`Open ${workspace.name}`}>
+        <Button
+          aria-haspopup="dialog"
+          aria-label={`Open ${workspace.name}`}
+          data-note="connect-methods"
+        >
           <SquareArrowOutUpRight className="size-4" strokeWidth={1.5} />
           Open
         </Button>

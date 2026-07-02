@@ -16,14 +16,17 @@ export function MetricGroupCard({
   title,
   items,
   loading = false,
+  dataNote,
 }: {
   title: string;
   items: MetricGroupItem[];
   loading?: boolean;
+  dataNote?: string;
 }) {
   return (
     <section
       aria-label={title}
+      data-note={dataNote}
       className="flex flex-col gap-4 rounded-md bg-surface-secondary p-6"
     >
       <h2 className="text-xs font-medium uppercase tracking-[0.06em] text-text-tertiary">

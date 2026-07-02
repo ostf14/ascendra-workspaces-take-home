@@ -24,6 +24,7 @@ export default function AdminOverviewPage() {
         <div className="flex flex-col gap-4">
           <MetricGroupCard
             title="Cost this month"
+            dataNote="cost-card"
             loading={isPending}
             items={[
               {

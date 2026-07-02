@@ -129,6 +129,7 @@ export function AdminVMTable({
               {COLUMNS.map((col) => (
                 <th
                   key={col.key}
+                  data-note={col.key === "lastActiveAt" ? "compact-time" : undefined}
                   className={cn(
                     "px-3 py-2 whitespace-nowrap",
                     col.align === "right" ? "text-right" : "text-left"

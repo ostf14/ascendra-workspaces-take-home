@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import { MSWProvider } from "@/components/msw-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
+import { DesignNotesProvider } from "@/lib/design-notes/context";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -39,7 +40,9 @@ export function Providers({ children }: { children: ReactNode }) {
     >
       <QueryClientProvider client={queryClient}>
         <MSWProvider>
-          <TooltipProvider delayDuration={120}>{children}</TooltipProvider>
+          <TooltipProvider delayDuration={120}>
+            <DesignNotesProvider>{children}</DesignNotesProvider>
+          </TooltipProvider>
           <Toaster position="bottom-right" />
         </MSWProvider>
       </QueryClientProvider>
