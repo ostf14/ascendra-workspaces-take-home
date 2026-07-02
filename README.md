@@ -1,183 +1,132 @@
 # Ascendra Workspaces
 
-A take-home for a Product Design Engineer role at Ascendra Networks: a thin slice of a managed remote-development-environment platform — the developer's home for their own VMs and the admin console for the fleet — built end-to-end with TypeScript, a mock backend, and a design system.
+Take-home for the Product Design Engineer role. Cloud dev environment platform: developer machines, admin fleet management, all wired to a mock backend.
 
-> **Deployed:** _add Vercel URL after deploy_
-
----
-
-## Run it
-
-```bash
-pnpm install
-pnpm dev          # http://localhost:3000
-```
-
-- Node 22 (`.nvmrc`-friendly; tested on 22.22)
-- `pnpm` 10+
-- Optional: `pnpm build && pnpm start` for the production build (same MSW mock baked in)
-
-The acting user is seeded as **Alex Morgan** (admin) so both surfaces are immediately demoable. See [Demoing both roles](#demoing-both-roles) below to switch to the engineer surface.
-
-## The product
-
-Ascendra Workspaces is a managed CDE platform — like Coder or GitHub Codespaces — for engineering organizations that need to give developers consistent, remote dev environments without manual VM ops. The product has two distinct surfaces under one shell:
-
-- **Developer surface** (`/workspaces/*`) — minimum friction to resume work, surface anything that interrupts it, and recover from failures.
-- **Admin surface** (`/admin/*`) — operational console that surfaces waste, lets the admin act on it, and manages templates + fleet inventory + utilization.
-
-Role determines which surfaces are visible in the top nav. There's no role switcher; that's a deliberate IA choice ([decision 01](decisions/01-role-based-navigation.md)).
-
-## Information architecture
-
-| Route | Surface | Purpose |
-|---|---|---|
-| `/login` | Auth | Sign-in stub |
-| `/` | — | Role-gated redirect to `/admin` or `/workspaces` |
-| `/403` · `/404` | — | Forbidden / unknown route |
-| `/workspaces` | Developer | List of the signed-in user's workspaces |
-| `/workspaces/new` | Developer | Template picker → name → confirm |
-| `/workspaces/[id]` | Developer | Connect, metrics, lifecycle, metadata |
-| `/admin` | Admin | Overview: waste card, hero metrics, 24h utilization |
-| `/admin/workspaces` | Admin | Fleet inventory: filters, sort, bulk actions |
-| `/admin/workspaces/new` | Admin | Provision workspace for a teammate |
-| `/admin/workspaces/[id]` | Admin | Drill-down with owner info + admin actions |
-| `/admin/utilization` | Admin | Aggregate trends + CPU distribution + cost by template |
-| `/admin/templates` | Admin | Templates list with usage stats |
-| `/admin/templates/new` · `/[id]` | Admin | Template create + edit |
-
-Reserved but out of scope for this exercise: `/settings`, `/admin/policies`, `/admin/users`, `/admin/audit`. See [future considerations](notes/future-considerations.md).
-
-Full file: [sitemap.md](sitemap.md).
-
-## Key product decisions
-
-Each decision lives in [`decisions/`](decisions/) as a short doc with context, options considered, the choice, and rationale.
-
-1. **[Role-based navigation](decisions/01-role-based-navigation.md)** — no role switcher, no login prompt. The user's role determines which sections appear in nav. Engineers see only Workspaces; admins see Workspaces + Admin. Direct engineer hits to `/admin/*` return 403, not a redirect, because the route shouldn't appear to exist for them.
-2. **[Multiple connect methods](decisions/02-connect-methods.md)** — the connect affordance exposes three methods (VS Code Desktop, browser IDE, raw SSH) at the same level of visibility. Auto-detection silently chooses for the user; a single button forces a default the product has no basis to pick.
-3. **[Actionable waste over raw metrics](decisions/03-actionable-waste.md)** — admin overview leads with `X idle workspaces, $Y wasted` as a hero card. Aggregate utilization is supporting context, not the primary surface. Frames Ascendra as a tool that **solves** waste, not one that helps you find it.
-4. **[State and persistence guarantees](decisions/04-state-and-persistence.md)** — every lifecycle action surfaces its persistence behaviour at the point of click (stop preserves state, restart drops processes, recreate keeps home directory, delete destroys everything). Typed-name confirmation modal on delete.
-5. **[ReMargin design direction](decisions/05-design-direction.md)** — adopt the existing ReMargin design system (Space Grotesk + JetBrains Mono, weights 400 / 500 only, warm-cream light / near-black dark, coral accent, capped 600+ weights) as the foundation. Filter out reader-specific tokens. Extend with operational primitives: status semantics, data-viz palette, hero metric typography, table density spec.
-6. **[Tech stack](decisions/06-tech-stack.md)** — Next.js (App Router) + React 19 + TypeScript strict, Tailwind v4 CSS-first config, restyled shadcn/ui primitives, TanStack Query for server state, MSW for a real mock backend that ships with the deploy, Recharts for charts, Zod for runtime validation at the API boundary.
-7. **[Data layer](decisions/07-data-layer.md)** — all data flows through typed API client → TanStack Query hooks → components. Hierarchical query keys for prefix invalidation. Per-resource polling intervals. Lifecycle mutations use optimistic updates with rollback on error.
-
-## Design direction
-
-The visual language is shared with my [ReMargin case study](https://mihhailovski-product-designer.vercel.app/case/remargin) — same fonts, same warm-cream and near-black surfaces, same coral accent, same capped weight scale. This is intentional: a personal design system applied across two projects reads as "this person has voice"; two projects in unrelated languages read as "this person executes briefs." The system is extended here for operational tooling — status semantics independent of the brand accent, hero metric typography in JetBrains Mono 500 at 48px, dense table spec for the admin inventory.
-
-Sentence case throughout. Font weights 400 and 500 only — never 600 or 700. Motion is opacity + transform, capped at 150ms, with a `prefers-reduced-motion` clamp.
+**Live:** https://ascendra-workspaces-take-home.vercel.app
+**Repo:** this one.
+**Demo:** Alex Morgan is auto-signed in with both engineer and admin roles. Everything is mocked.
 
 ## Stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| Framework | Next.js (App Router) | Route groups for the two surfaces, integrated routing, native Vercel deploy, MSW boots in a single process |
-| Language | TypeScript strict | `noImplicitAny` + `noUncheckedIndexedAccess` on top of strict |
-| Styling | Tailwind v4 + restyled shadcn/ui | CSS-first `@theme` block maps directly to ReMargin tokens |
-| Server state | TanStack Query | Industry default; handles loading / error / refetch / optimistic / invalidation |
-| Mock backend | MSW (Mock Service Worker) | Intercepts real `fetch` — UI code doesn't know the backend is fake; ships with the deploy |
-| Validation | Zod | Runtime parse of every API response; types via `z.infer<>` |
-| Charts | Recharts | Restylable to the design direction, minimal chrome possible |
-| Icons | Lucide | Outline-only, 1.5px stroke |
-| Dates | date-fns | Tree-shakeable, no globals |
-| Deploy | Vercel | One-click for Next.js |
+- Next.js 15 App Router, TypeScript strict
+- Tailwind v4, shadcn/ui primitives
+- TanStack Query, MSW for the mock backend
+- Recharts for visualizations
+- Space Grotesk + JetBrains Mono
+- Vercel deployment
 
-Full rationale: [decisions/06-tech-stack.md](decisions/06-tech-stack.md).
+## Run locally
 
-## Data layer notes
-
-- **Domain shapes** live in [`lib/domain/schemas.ts`](lib/domain/schemas.ts) as Zod schemas (`vmSchema`, `vmTemplateSchema`, `userSchema`, `fleetUtilizationSchema`, etc.). Types are derived via `z.infer<>` in [`lib/domain/types.ts`](lib/domain/types.ts).
-- **API client** at [`lib/api/client.ts`](lib/api/client.ts) is a thin `fetch` wrapper that always parses through a Zod schema. `ApiError` carries status + optional code and is thrown on non-2xx. Per-resource modules live next to it.
-- **Hooks** at [`lib/hooks/*`](lib/hooks/) follow the query-key convention from decision 07. Polling intervals: workspaces list 10s, workspace detail 5s when stable and 2s when starting/stopping (read from cached status), admin overview 30s, fleet inventory 15s. Templates and utilization don't poll.
-- **Optimistic updates** for every lifecycle mutation: snapshot list + detail in `onMutate`, apply the optimistic status, rollback in `onError` with a sonner toast, invalidate workspaces + admin fleet + overview in `onSettled` so the admin surface stays in sync with developer actions.
-- **Mock backend** at [`mocks/`](mocks/) seeds 20 users, 5 templates, and 60 workspaces with the distributions in [`notes/mock-data-plan.md`](notes/mock-data-plan.md): 42 running (12 idle, ~$346/month wasted), 14 stopped, 2 starting, 1 stopping, 1 error; CPU bins of 14/8/5/9/6 for the bimodal distribution chart; shaped-sine time-series with a daily rhythm (low overnight, peak 11-17). Latency simulated at 100-400ms.
-- **Lifecycle transitions** are real: triggering `/start` flips status to `starting`, then to `running` after an 8-15s timer baked into the mock store. The 2s polling on transitional detail catches the transition without the user refreshing.
-
-## Demoing both roles
-
-The default seeded user is **Alex Morgan** (admin) so both surfaces are demoable on first load. To preview the engineer experience, set the localStorage override the API client picks up:
-
-```js
-// in DevTools console
-localStorage.setItem("ascendra-acting-user", "user-sam");
-location.reload();
+```bash
+pnpm install
+pnpm dev
 ```
 
-You'll see the admin section disappear from the top nav (engineers see only Workspaces) and the workspaces list empty (Engineer Sam owns nothing in the seed) — the empty state shows the onboarding affordance from `screens/developer.md`.
+Then http://localhost:3000. Everything runs off MSW; no external services required.
 
-To switch back:
+---
 
-```js
-localStorage.removeItem("ascendra-acting-user");
-location.reload();
+## How I read the brief
+
+The brief has one implicit tension worth naming up front: two audiences with different mental models sharing one product.
+
+**Developers** want a fast, uncluttered surface to reach their workspace. They don't care about the fleet. They care about "is my machine running, is it responsive, how do I connect?"
+
+**Admins** want the opposite — density, tables, actionable insight into money and utilization. They care about the fleet, not individual machines.
+
+Building a single dashboard that serves both means one of two failure modes: over-simplify and lose admin depth, or over-instrument and drown developers in metrics they don't need. I chose to separate the two experiences by URL and layout register while keeping the same design system so it still reads as one product.
+
+The second implicit ask: the brief lists a lot of admin capabilities (utilization visualization, distribution, templates, policies, per-user analysis...). Trying to build all of them in 4–6 hours would produce shallow versions of each. I picked a smaller set to execute at real quality — waste-first admin overview, master-detail inventory, distribution as a decision surface — and left the rest with honest notes.
+
+---
+
+## Key decisions
+
+### One product, two registers
+
+- **Developer surface** at `/workspaces` uses master-detail with a permanent right panel showing full workspace context. Fewer surfaces, direct action, roomier spacing.
+- **Admin surface** at `/admin/*` uses a sub-nav (Overview / Workspaces / Utilization / Templates) with denser tables and more chart surface.
+
+Both share typography, spacing grid, radii, and the cool blue accent — they read as one system. But content density and interaction rhythm differ because the users differ.
+
+### Waste-first admin overview
+
+Most admin dashboards open with a metrics grid. That's a passive read. I opened `/admin` with a single-line waste insight: **"12 idle workspaces wasting ~$346/month · Review →"**
+
+Admins visit the utilization page with one goal: find the money leak. Surface that first, with the action attached. Metrics come below for context. The waste card is what pays for the whole tool.
+
+### Distribution as a decision surface, not a chart
+
+The CPU distribution card on `/admin/utilization` started as five horizontal bars — accurate but hard to read. I rebuilt it as a hybrid: **vertical histogram with three semantic zone bands (IDLE / HEALTHY / NEAR CAP)** plus three actionable summary rows below.
+
+Bimodal shape (some idle, some hot) is visible in one glance. The three summary rows give the three actions: stop idle workspaces (~$1,470/month recoverable), do nothing (healthy), consider larger templates (near capacity). Chart plus decision surface in one view.
+
+### Three connect methods, not one
+
+The brief mentions "Open in IDE." Coder, Gitpod, Codespaces all support at least three: browser IDE, VS Code Desktop with Remote SSH, plain SSH. Locking developers into browser-only would be a real product regression. I show all three via a popover on the primary Open action.
+
+### State as source of truth, URL as mirror
+
+Selection state on both developer and admin master-detail lives in React state. The URL param (`?w=<id>`, `?t=<id>`) is mirrored via `window.history.replaceState` in an effect. A `popstate` listener syncs state back when the browser back/forward changes the URL.
+
+This bypasses Next.js router coalescing entirely. Rapid clicks (I tested with 8 clicks in 40ms) never drop selections. Without this, the router batched replaces and occasionally dropped the whole batch — the panel just wouldn't update. Not a design decision per se, but the kind of thing that shows up as "the app feels laggy" in real product review, and I wanted it fixed properly.
+
+### Palette diverged from my portfolio system
+
+I reuse the systemic layer from my personal design system (typography, spacing grid, radii, transition curves, weight rules) across projects — that's the cross-portfolio signature.
+
+The surface palette here diverged. My reading product uses warm cream surfaces (editorial register). For an operational dashboard, warm cream + cool blue read as a register mismatch. I did a color audit of Integrity — operational tool in an adjacent category — and settled on cool off-white neutrals (`#f7f8fa` page, `#1f242b` text, solid hex borders) plus softened status colors: pinkish red for error instead of pure red, warm orange for pending. Less alarmist, better for a tool you look at all day.
+
+Two products in the same design system can (and should) have different surface treatments. What travels is the underlying rhythm, not the wallpaper.
+
+### Number formatting
+
+Persistent hint on lifecycle transitions ("Starting · ~12s") because "starting" without duration is anxiety. Compact time notation in tables (`13m`, `3h`, `2d`) because "about 3 hours ago" is twenty characters of noise. US number format ($6.44, $2,782) because the product is in USD. Small choices, big cumulative effect on density.
+
+---
+
+## What I intentionally skipped
+
+- **Policies & quotas.** Interesting design surface but rabbit-hole in 4–6 hours. Would need per-team scoping, effective-vs-declared distinction, override rules. Deferred.
+- **User and team management.** Same reason. Also felt lower-value than executing the utilization story well.
+- **Real backend integration.** Everything runs off MSW handlers. The API surface is designed swap-compatible — the query layer expects HTTP responses, not mocks.
+- **Fully audited accessibility.** Semantic markup, `aria-current` on navigation, keyboard-navigable primary flows, adequate contrast. But I haven't done a full VoiceOver pass. That would be day one of production work.
+- **Mobile.** Layouts adapt to ~880px viewports (master-detail wraps to single column), but this is a desktop tool. A real mobile experience would need a different information architecture, not a shrunk one.
+- **Component tests.** This is a design engineering prototype, not a production module. In a real codebase, I'd write E2E tests for the master-detail selection paths and unit tests for the cost calculations on distribution.
+
+---
+
+## What I'd do next
+
+**Persona switcher.** Alex Morgan has both roles. The current top nav treats developer / admin as sections of one product, but they're two audiences. A segmented mode switcher (`[👤 My workspaces | ⚙️ Admin]`) would frame it correctly.
+
+**Auto-stop policies via distribution.** The utilization distribution and idle indicator naturally point toward a schedule-based auto-stop feature. The 24h chart shows fleet activity dropping to near-zero overnight — that's the feature's value proposition written in the data.
+
+**Idle filter wire-up.** The waste card's "Review →" link should filter the inventory to idle-only. I wired the intent, not the implementation.
+
+**Template usage analytics.** Which templates are most-used, which are stale, which are overpowered for their workload. Would nest inside the templates panel.
+
+**Design notes overlay.** In-product annotations that surface the rationale on hover. Turns the prototype into a walkable case study without leaving the UI.
+
+---
+
+## A note on Claude Code
+
+I used Claude Code as my implementation partner throughout. Every design decision is mine, every product decision is mine. Claude Code handled the code writing, TypeScript wrangling, MSW handler wiring, and a lot of debugging I'd rather not have debugged myself (Next.js router coalescing on rapid replaces; Recharts `ResponsiveContainer` height gotchas). I directed the work through prompts written like design briefs — decisions first, implementation as consequence.
+
+I mention this because it changes how you should read the code. Organizational quality (component structure, typing consistency, data layer discipline) is Claude Code doing what it does well. Product judgment — what's in, what's out, what goes where, why the waste card comes first — is mine. If you want to evaluate my code taste specifically, the `decisions/` folder shows the shape of my prompts.
+
+---
+
+## File layout
 ```
 
-Mechanically: the API client at [`lib/api/client.ts`](lib/api/client.ts) reads the `ascendra-acting-user` localStorage key on every request and injects an `X-Acting-User` header. The MSW handler at [`mocks/handlers.ts`](mocks/handlers.ts) reads that header in `/api/me` and `/api/workspaces` to resolve the acting user. No rebuild required.
-
-## What I'd add with more time
-
-Conscious gaps, documented to show awareness of where the category is heading. Full text in [notes/future-considerations.md](notes/future-considerations.md).
-
-- **Prebuilds + template caching** — CI-triggered build that pre-installs deps and caches the image so new workspaces start in seconds, not minutes. The single biggest lever on the slow-start problem.
-- **Per-PR ephemeral workspaces** — workspaces tied to a branch, provisioned when a PR opens and destroyed when it merges. Different ownership and cost attribution from persistent personal workspaces.
-- **AI agents as workspace owners** — Coder and others launched governance features for this in 2025/26. Implies extending `User.role` to include `agent`, with different policies (cost ceilings, idle thresholds, audit requirements per agent type).
-- **Multi-region** — `region` is a static descriptive field today. In production it drives placement, latency, compliance.
-- **Audit log** — chronological record of who created / started / stopped / deleted / reassigned each workspace.
-- **Policies and quotas as a first-class section** — the idle threshold powering the waste card is hardcoded; in production it's a tunable policy attached to a team.
-- **Users and teams management** — owner info is read inline on inventory rows; a dedicated section with per-user VM count, utilization, total cost.
-- **Notification surface** — when an admin provisions a workspace for a developer, when auto-stop fires, when a workspace errors out.
-- **Real-time updates** — polling is enough for this exercise; WebSocket or SSE for status transitions in production.
-
-## Repository layout
+app/ Next.js App Router (developer)/ Developer surface (admin)/ Admin surface components/ UI components, split by domain lib/ API client, hooks, formatters mocks/ MSW handlers and seed data screens/ Per-screen design specs decisions/ Design decision records notes/ Working notes (mock-data plan, color inventory)
 
 ```
-app/                            # Next.js App Router
-├── (auth)/                     # login, 403, 404
-├── (developer)/workspaces/     # list, detail, new
-├── (admin)/admin/              # overview, workspaces, utilization, templates
-├── error.tsx                   # global error boundary
-├── not-found.tsx
-├── providers.tsx               # QueryClient + ThemeProvider + MSWProvider + Tooltip + Toaster
-└── globals.css                 # design tokens via @theme
 
-components/
-├── admin/                      # hero metric, waste card, table, bulk bar, distribution chart, owner card, admin actions, template form/list
-├── workspace/                  # status badge, usage metric, lifecycle controls, connect panel, card, template card, metrics chart, metadata, idle hint, logs, starting progress
-├── layout/                     # top nav, sub nav, error boundary, centered card, route placeholder
-└── ui/                         # shadcn primitives, restyled
+---
 
-lib/
-├── api/                        # client.ts (typed fetch + Zod) + per-resource modules
-├── hooks/                      # TanStack Query hooks + key factory
-├── domain/                     # Zod schemas + inferred types
-└── utils/                      # workspace name generator (Coder-style adjective-animal-NN)
+Live: https://ascendra-workspaces-take-home.vercel.app
 
-mocks/                          # MSW handlers + seed data + service worker
-```
-
-## Time spent
-
-About **6 hours** end-to-end, split across the eight phases from [`notes/execution-plan.md`](notes/execution-plan.md):
-
-| Phase | Goal | ~time |
-|---|---|---|
-| 1 | Next bootstrap, tokens, theme toggle, route shell | 30 min |
-| 2 | Zod schemas, MSW handlers, mock data per plan | 60 min |
-| 3 | Typed API client, hooks with polling + optimistic | 45 min |
-| 4 | Developer surface end-to-end | 75 min |
-| 5 | Admin overview + fleet inventory | 75 min |
-| 6 | Utilization + templates + admin detail + provision | 45 min |
-| 7 | States polish, motion, a11y baseline | 30 min |
-| 8 | README + deploy | 20 min |
-
-## Planning artifacts
-
-This repo opens with the planning pack I wrote before code:
-
-- [`sitemap.md`](sitemap.md) — every route in scope
-- [`decisions/`](decisions/) — seven decision docs (01-07)
-- [`screens/developer.md`](screens/developer.md), [`screens/admin.md`](screens/admin.md) — skeleton specs per surface
-- [`notes/mock-data-plan.md`](notes/mock-data-plan.md) — seed distribution plan
-- [`notes/future-considerations.md`](notes/future-considerations.md) — conscious gaps
-- [`notes/execution-plan.md`](notes/execution-plan.md) — eight-phase roadmap
+Thanks for reading.
