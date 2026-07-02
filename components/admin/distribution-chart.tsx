@@ -1,7 +1,7 @@
 "use client";
 
 import type { UtilizationBucket } from "@/lib/domain/types";
-import { formatNumber, formatPercent } from "@/lib/utils/format";
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/utils/format";
 import { cn } from "@/lib/utils";
 
 // Horizontal bar histogram (per decision 03): reveals "half hot, half cold"
@@ -28,28 +28,42 @@ export function DistributionChart({ buckets }: { buckets: UtilizationBucket[] })
         {buckets.map((bucket) => {
           const widthPct = (bucket.count / max) * 100;
           const sharePct = total > 0 ? (bucket.count / total) * 100 : 0;
+          const recoverable = bucket.recoverableMonthlyCost;
           return (
-            <li
-              key={bucket.label}
-              className="grid grid-cols-[80px_1fr_64px] items-center gap-3"
-            >
-              <span className="font-mono text-xs text-text-tertiary">
-                {bucket.label}
-              </span>
-              <div className="relative h-5 rounded-sm bg-surface-secondary">
-                <span
-                  className={cn(
-                    "absolute inset-y-0 left-0 rounded-sm",
-                    bucket.count === 0
-                      ? "bg-border-default"
-                      : "bg-accent-coral/70"
-                  )}
-                  style={{ width: `${Math.max(widthPct, bucket.count > 0 ? 1.5 : 0)}%` }}
-                />
+            <li key={bucket.label} className="flex flex-col gap-1">
+              <div className="grid grid-cols-[80px_1fr_64px] items-center gap-3">
+                <span className="font-mono text-xs text-text-tertiary">
+                  {bucket.label}
+                </span>
+                <div className="relative h-5 rounded-sm bg-surface-secondary">
+                  <span
+                    className={cn(
+                      "absolute inset-y-0 left-0 rounded-sm",
+                      bucket.count === 0
+                        ? "bg-border-default"
+                        : "bg-accent-coral/70"
+                    )}
+                    style={{
+                      width: `${Math.max(widthPct, bucket.count > 0 ? 1.5 : 0)}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-right font-mono text-xs tabular-nums text-text-secondary">
+                  {formatNumber(bucket.count)} · {formatPercent(sharePct)}
+                </span>
               </div>
-              <span className="text-right font-mono text-xs tabular-nums text-text-secondary">
-                {formatNumber(bucket.count)} · {formatPercent(sharePct)}
-              </span>
+              {recoverable && recoverable > 0 ? (
+                <p className="pl-[92px] text-[11px] italic text-text-tertiary">
+                  {bucket.count} idle candidate{bucket.count === 1 ? "" : "s"} ·{" "}
+                  <span
+                    className="font-mono not-italic tabular-nums"
+                    style={{ color: "var(--status-idle)" }}
+                  >
+                    ~{formatCurrency(recoverable, { fractionDigits: 0 })}/month
+                  </span>{" "}
+                  recoverable
+                </p>
+              ) : null}
             </li>
           );
         })}

@@ -591,27 +591,37 @@ function aggregateRunning(): { cpu: number; memory: number; hourly: number; coun
 }
 
 function computeDistribution(): UtilizationBucket[] {
-  const bins: UtilizationBucket[] = [
-    { label: "0–10%", min: 0, max: 10, count: 0 },
-    { label: "10–30%", min: 10, max: 30, count: 0 },
-    { label: "30–60%", min: 30, max: 60, count: 0 },
-    { label: "60–85%", min: 60, max: 85, count: 0 },
-    { label: "85–100%", min: 85, max: 100, count: 0 },
+  const bins: (UtilizationBucket & { hourlyCostSum: number })[] = [
+    { label: "0–10%", min: 0, max: 10, count: 0, hourlyCostSum: 0 },
+    { label: "10–30%", min: 10, max: 30, count: 0, hourlyCostSum: 0 },
+    { label: "30–60%", min: 30, max: 60, count: 0, hourlyCostSum: 0 },
+    { label: "60–85%", min: 60, max: 85, count: 0, hourlyCostSum: 0 },
+    { label: "85–100%", min: 85, max: 100, count: 0, hourlyCostSum: 0 },
   ];
   for (const w of workspaces) {
     if (w.status !== "running") continue;
     for (const b of bins) {
-      if (w.cpu >= b.min && w.cpu < b.max) {
-        b.count += 1;
-        break;
-      }
-      if (w.cpu === 100 && b.max === 100) {
-        b.count += 1;
-        break;
-      }
+      const inRange =
+        (w.cpu >= b.min && w.cpu < b.max) || (w.cpu === 100 && b.max === 100);
+      if (!inRange) continue;
+      b.count += 1;
+      b.hourlyCostSum += w.hourlyCost;
+      break;
     }
   }
-  return bins;
+  // Attach a "recoverable if these were stopped" projection to the two low
+  // buckets, since those are the ones an admin can act on. 720 hours ≈ month.
+  // Rounded to the nearest $10 so the number reads as a signal, not a
+  // precise accounting figure.
+  const HOURS_PER_MONTH = 720;
+  return bins.map((b) => {
+    const { hourlyCostSum, ...rest } = b;
+    const isUnderutilized = b.max <= 30 && b.count > 0;
+    if (!isUnderutilized) return rest;
+    const raw = hourlyCostSum * HOURS_PER_MONTH;
+    const rounded = Math.round(raw / 10) * 10;
+    return { ...rest, recoverableMonthlyCost: rounded };
+  });
 }
 
 function computeCostByTemplate(): CostByTemplate[] {

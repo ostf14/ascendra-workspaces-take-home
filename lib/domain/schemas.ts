@@ -86,6 +86,11 @@ export const utilizationBucketSchema = z.object({
   min: z.number(),
   max: z.number(),
   count: z.number().int().nonnegative(),
+  // Only set on buckets the mock flags as underutilized. Sum of the hourly
+  // cost of workspaces in the bucket * 720 (hours per month) — an "if you
+  // stopped these idle candidates, this is what you'd save" number that ties
+  // the distribution chart to a cost impact instead of a raw count.
+  recoverableMonthlyCost: z.number().nonnegative().optional(),
 });
 
 export const costByTemplateSchema = z.object({
