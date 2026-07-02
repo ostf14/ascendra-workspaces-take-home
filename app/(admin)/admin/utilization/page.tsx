@@ -30,7 +30,16 @@ export default function AdminUtilizationPage() {
         </p>
       </header>
 
-      <div key={range} className="animate-fade-in">
+      {/*
+        The chart card lives inside a definite-height wrapper so the
+        recharts ResponsiveContainer (height="100%") has a real parent
+        height to resolve against. Without it the section only carries
+        min-height, which CSS percentage heights don't resolve to, and
+        the SVG paints at zero height. On /admin the sibling grid cell
+        supplies that definite height via items-stretch — here we have
+        no sibling, so we supply the height directly.
+      */}
+      <div key={range} className="h-[320px] animate-fade-in">
         <AdminOverviewChart
           series={data ? { cpu: data.cpu, memory: data.memory } : undefined}
           loading={isPending}
