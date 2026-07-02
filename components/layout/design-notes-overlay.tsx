@@ -24,10 +24,28 @@ type Anchor = {
   y: number;
 };
 
-// Poll anchor positions on rAF while the overlay is on. Reads 10 rects per
-// frame — cheap on a modern browser and worth the reliability: this catches
-// scroll, resize, route change, and any layout mutation from within the
-// product (dialog opens, panel expands, row selection shifts things).
+// Clamp a pin's viewport coordinates so it never sits behind the meta-bar,
+// off the right edge, or off the left. The default anchor is the top-right
+// corner of the target element, offset outward (translate(-8, -8) baked
+// into the pin's own CSS). Elements near the edges of the viewport push
+// the raw coord out of frame — clamp the numeric coord instead of only
+// styling around it, so both the pin AND its popover anchor stay in view.
+function clampPin(x: number, y: number, vw: number): { x: number; y: number } {
+  const RIGHT_MARGIN = 32;
+  const LEFT_MARGIN = 12;
+  const TOP_MARGIN = 48; // 32px meta-bar + 16px breathing room
+  return {
+    x: Math.max(LEFT_MARGIN, Math.min(x, vw - RIGHT_MARGIN)),
+    y: Math.max(TOP_MARGIN, y),
+  };
+}
+
+// Compute anchor positions on the events that can move them: window
+// resize, scroll (capture:true — catches nested scroll containers too),
+// ResizeObserver on the body (catches container-driven size shifts), and
+// MutationObserver on the body (catches anchors appearing / disappearing).
+// All triggers batch through a shared rAF so we recompute at most once per
+// frame regardless of how many events fire.
 function useAnchorPositions(enabled: boolean, pathname: string): Anchor[] {
   const [anchors, setAnchors] = useState<Anchor[]>([]);
 
@@ -36,11 +54,13 @@ function useAnchorPositions(enabled: boolean, pathname: string): Anchor[] {
       setAnchors([]);
       return;
     }
+
     let raf = 0;
     let mounted = true;
 
-    function tick() {
+    function recompute() {
       if (!mounted) return;
+      const vw = window.innerWidth;
       const next: Anchor[] = [];
       DESIGN_NOTES.forEach((note, i) => {
         const el = document.querySelector<HTMLElement>(
@@ -48,16 +68,15 @@ function useAnchorPositions(enabled: boolean, pathname: string): Anchor[] {
         );
         if (!el) return;
         const rect = el.getBoundingClientRect();
-        // Skip elements with zero area (display:none, unrendered)
         if (rect.width === 0 && rect.height === 0) return;
+        const clamped = clampPin(rect.right, rect.top, vw);
         next.push({
           note,
           number: i + 1,
-          x: rect.right,
-          y: rect.top,
+          x: clamped.x,
+          y: clamped.y,
         });
       });
-      // Cheap change detection so React doesn't re-render every frame
       setAnchors((prev) => {
         if (prev.length !== next.length) return next;
         for (let i = 0; i < prev.length; i += 1) {
@@ -73,12 +92,37 @@ function useAnchorPositions(enabled: boolean, pathname: string): Anchor[] {
         }
         return prev;
       });
-      raf = requestAnimationFrame(tick);
     }
-    raf = requestAnimationFrame(tick);
+
+    function schedule() {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        recompute();
+      });
+    }
+
+    recompute();
+
+    window.addEventListener("resize", schedule);
+    window.addEventListener("scroll", schedule, {
+      passive: true,
+      capture: true,
+    });
+    const ro = new ResizeObserver(schedule);
+    ro.observe(document.body);
+    const mo = new MutationObserver(schedule);
+    mo.observe(document.body, { childList: true, subtree: true });
+
     return () => {
       mounted = false;
-      cancelAnimationFrame(raf);
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("scroll", schedule, {
+        capture: true,
+      } as EventListenerOptions);
+      ro.disconnect();
+      mo.disconnect();
     };
   }, [enabled, pathname]);
 
@@ -162,9 +206,9 @@ function Pin({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        side="bottom"
-        align="start"
-        sideOffset={6}
+        side="top"
+        align="end"
+        sideOffset={8}
         className="w-[320px] gap-2 p-3"
       >
         <div className="flex items-baseline gap-2">
