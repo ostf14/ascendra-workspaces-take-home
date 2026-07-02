@@ -719,6 +719,17 @@ export function updateTemplate(
   };
 }
 
+export function deleteTemplate(id: string): { deleted: boolean; workspaceCount: number } {
+  const index = TEMPLATES.findIndex((t) => t.id === id);
+  if (index === -1) return { deleted: false, workspaceCount: 0 };
+  // Refuse to delete a template that still has workspaces attached — mirrors
+  // real backends and keeps referential integrity on the mock inventory.
+  const workspaceCount = workspaces.filter((w) => w.templateId === id).length;
+  if (workspaceCount > 0) return { deleted: false, workspaceCount };
+  TEMPLATES.splice(index, 1);
+  return { deleted: true, workspaceCount: 0 };
+}
+
 export function listOwnWorkspaces(request?: Request): VM[] {
   tickTransitions();
   const ownerId = resolveActingUserId(request);

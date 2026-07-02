@@ -18,6 +18,7 @@ import {
   buildWorkspaceMetrics,
   createTemplate,
   createWorkspace,
+  deleteTemplate,
   deleteWorkspace,
   duplicateWorkspace,
   getCurrentUser,
@@ -197,6 +198,23 @@ export const handlers = [
     const t = updateTemplate(String(params.id), parsed.data);
     if (!t) return notFound("Template not found");
     return HttpResponse.json(t);
+  }),
+
+  http.delete("/api/admin/templates/:id", async ({ params }) => {
+    await delay();
+    const result = deleteTemplate(String(params.id));
+    if (!result.deleted) {
+      return HttpResponse.json(
+        {
+          message: `Cannot delete: ${result.workspaceCount} workspace${
+            result.workspaceCount === 1 ? " is" : "s are"
+          } still provisioned from this template.`,
+          code: "template_in_use",
+        },
+        { status: 409 }
+      );
+    }
+    return new HttpResponse(null, { status: 204 });
   }),
 
   http.post("/api/admin/workspaces", async ({ request }) => {

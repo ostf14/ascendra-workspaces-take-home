@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import {
   createTemplate,
+  deleteTemplate,
   fetchTemplate,
   fetchTemplates,
   updateTemplate,
@@ -99,6 +100,28 @@ export function useUpdateTemplate(id: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: adminKeys.templates() });
       void queryClient.invalidateQueries({ queryKey: adminKeys.template(id) });
+    },
+  });
+}
+
+export function useDeleteTemplate() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteTemplate(id),
+    onSuccess: (_result, id) => {
+      queryClient.setQueryData<TemplateWithUsage[]>(
+        adminKeys.templates(),
+        (prev) => (prev ? prev.filter((t) => t.id !== id) : prev)
+      );
+      queryClient.removeQueries({ queryKey: adminKeys.template(id) });
+    },
+    onError: (error) => {
+      const message =
+        error instanceof ApiError ? error.message : "Could not delete template";
+      toast.error(message);
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: adminKeys.templates() });
     },
   });
 }

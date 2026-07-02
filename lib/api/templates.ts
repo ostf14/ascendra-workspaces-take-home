@@ -11,7 +11,7 @@ import type {
   UpdateTemplateRequest,
 } from "@/lib/domain/types";
 
-import { apiGet, apiPatch, apiPost } from "./client";
+import { apiDelete, apiGet, apiPatch, apiPost } from "./client";
 
 const templatesListSchema = z.array(templateWithUsageSchema);
 
@@ -49,4 +49,8 @@ export function updateTemplate(
     templateWithUsageSchema,
     updateTemplateRequestSchema.parse(patch)
   );
+}
+
+export function deleteTemplate(id: string): Promise<void> {
+  return apiDelete(`/api/admin/templates/${encodeURIComponent(id)}`);
 }

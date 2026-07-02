@@ -96,14 +96,22 @@ Master-detail layout — compact template cards on the left (2/3), template deta
 - vCPU / Memory / Disk chips + "N in use" on the right
 - No inline Edit — that action moved into the detail panel
 
-**Panel (right 1/3, min-width 380px):**
-Top to bottom:
-- Header: template name + `Edit` outline button on the right (links to `/admin/templates/[id]`)
+**Panel (right 1/3, min-width 380px).** The panel has two modes — `view` and `edit` — with the same outer surface. Mode is internal panel state; selecting a different template resets it to `view`.
+
+**View mode, top to bottom:**
+- Header row: template name (`--text-lg`, weight 500, truncates) + hourly cost chip on `--surface-secondary` inline, then three icon-only ghost buttons on the far right: Edit (`Pencil`, `--text-secondary`, tooltip "Edit template") · Clone (`Copy`, tooltip "Duplicate template") · Delete (`Trash2`, `--status-error`, tooltip "Delete template"). Edit doesn't navigate — it flips the panel into edit mode in place. Clone POSTs a duplicate with " (copy)" appended to the name so the new record appears at the top of the compact list. Delete opens a confirm dialog; if any workspaces reference the template the dialog explains why deletion is blocked (referential integrity — see the mock's `deleteTemplate` for the guard).
 - Base image (mono, tertiary) and description
 - Specs plate: vCPU · Memory · Disk (three columns, `--surface-secondary`, `--radius-md`)
 - Preinstalled tools chip row (only when non-empty)
 - Usage plate: `In use` count + `Est. monthly` cost contribution — same visual treatment as the workspaces panel's cost plate for design coherence
 - Recent workspaces: last 5 workspaces provisioned from this template, sorted by `lastActiveAt` desc. Each row shows mono workspace name, owner email, status pill, compact last-active time; clicking a row deep-links to `/admin/workspaces?w=<vm-id>` so the admin can jump straight into the fleet detail panel. Empty state when no workspaces reference the template.
+
+**Edit mode:**
+- Header collapses to a plain `"Editing template"` label (`--text-sm`, tertiary) + a Cancel button on the far right. The three action icons are hidden — nothing to duplicate/delete/re-edit while inside edit mode.
+- Form fields, all pre-filled from the current template: Description (textarea, 1–200 chars, counter under the label), Base image (text input, docker-image charset), vCPU / Memory / Disk (three number inputs in a row, 1–64 / 1–256 GB / 10–2000 GB), Hourly cost (number input with `$` prefix and `/hr` suffix, 0.01–100), Preinstalled tools (chip list with X removal + "+ Add tool" inline input, alphanumeric + `@.-` per token, max 20, uniqueness enforced).
+- Recent workspaces and the derived cost breakdown are hidden — nothing editable there.
+- Sticky footer at `bottom: 0` inside the scroll wrapper: `[Cancel]` (ghost) and `[Save changes]` (primary). Save runs the validator; any invalid field renders a red hint underneath and blocks submit. On success PATCH lands, the optimistic update propagates to the compact list on the left, a toast confirms, and the panel returns to view mode with the new values.
+- Validation errors clear per field as the user edits that field — no need to hit Save again to see them recompute.
 
 Selection state uses the state-as-truth + `history.replaceState` mirror pattern — see the workspaces surface. URL parameter is `?t=<template-id>`.
 
